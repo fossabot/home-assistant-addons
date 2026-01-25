@@ -22,7 +22,7 @@ jobs:
       - name: 📝 Update README.md
         uses: rigerc/home-assistant-addons/.github/actions/update-readme@main
         with:
-          addons: ${{ inputs.addon }}
+          addons: ${{ inputs.addons }}
       - name: 🚀 Commit new README
         uses: stefanzweifel/git-auto-commit-action@v5.2.0
         with:

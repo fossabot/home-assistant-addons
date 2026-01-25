@@ -1,4 +1,9 @@
 ---
+ignore: |
+  .claude/
+  docs/
+  scripts/
+
 rules:
   braces:
     level: error
