@@ -12,7 +12,7 @@ arch:
 image: "ghcr.io/bluemaex/ha-addons-romm-{arch}"
 startup: system
 boot: auto
-url: https://github.com/bluemaex/home-assistant-addons/tree/master/romm
+url: https://github.com/rigerc/home-assistant-addons/tree/master/romm
 init: false
 ingress: true
 ingress_port: 8080
