@@ -7,6 +7,9 @@ labels:
   org.opencontainers.image.authors: "bluemaex <homeassistant@blmx.de>"
   org.opencontainers.image.licenses: "MIT License"
   org.opencontainers.image.title: "Home Assistant Unofficial Add-on: romm"
-  org.opencontainers.image.url: https://github.com/bluemaex/home-assistant-addons
-  org.opencontainers.image.source: https://github.com/bluemaex/home-assistant-addons/romm
-  org.opencontainers.image.documentation: https://github.com/bluemaex/home-assistant-addons/romm/README.md
+  org.opencontainers.image.url: https://github.com/rigerc/home-assistant-addons
+  org.opencontainers.image.source: https://github.com/rigerc/home-assistant-addons/romm
+  org.opencontainers.image.documentation: https://github.com/rigerc/home-assistant-addons/romm/README.md
+  org.opencontainers.image.created: "2026-01-25T02:05:28Z"
+  org.opencontainers.image.revision: b22d65d9f92b85aebeba3a79b710a93f6fff5201
+  org.opencontainers.image.version: 0.1.0

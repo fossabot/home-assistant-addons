@@ -1,8 +1,3 @@
-{{- $repo := .Env.REPOSITORY -}}
-{{- $repo_url := .Env.REPOSITORY_URL -}}
-{{- $arch := .Env.ARCHITECTURES | jsonArray -}}
-{{- $addons := .Env.ADDONS_DATA | jsonArray -}}
-
 # bluemaex's Add-ons Shack
 
 ![Project Stage][project-stage-shield]
@@ -24,25 +19,28 @@ straightforward. In the Home Assistant add-on store, a possibility to
 add a repository is provided.
 
 1. Navigate in your Home Assistant frontend to **Supervisor -> Add-on Store**
-1. Add this new repository by URL (`{{ $repo_url }}`)
+1. Add this new repository by URL (`https://github.com/rigerc/home-assistant-addons`)
 1. Find the add-on that you want to use and click it
 1. Click on the "INSTALL" button
 
 ## Add-ons
 
 This repository contains the following add-ons:
-{{ range $addons }}
-### &#10003; [{{ .name }}][addon-{{ .slug }}]
 
-![Latest Version][{{ .slug }}-version-shield]
-![Supports armhf Architecture][{{ .slug }}-armhf-shield]
-![Supports armv7 Architecture][{{ .slug }}-armv7-shield]
-![Supports aarch64 Architecture][{{ .slug }}-aarch64-shield]
-![Supports amd64 Architecture][{{ .slug }}-amd64-shield]
+### &#10003; [Romm][addon-romm]
 
-{{ .description }}
-[:books: {{ .name }} add-on documentation][addon-doc-{{ .slug }}]
-{{ end }}
+![Latest Version][romm-version-shield]
+![Supports armhf Architecture][romm-armhf-shield]
+![Supports armv7 Architecture][romm-armv7-shield]
+![Supports aarch64 Architecture][romm-aarch64-shield]
+![Supports amd64 Architecture][romm-amd64-shield]
+
+Self-hosted ROM collection manager and emulator launcher.
+Scan, organize, and manage game collections across 400+ platforms with
+automatic metadata fetching and in-browser gameplay.
+
+[:books: Romm add-on documentation][addon-doc-romm]
+
 
 ## License
 
@@ -68,22 +66,16 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-[add-repository-button]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url={{ $repo_url }}
+[add-repository-button]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https://github.com/rigerc/home-assistant-addons
 [ha-addons]: https://www.home-assistant.io/addons/
 [add-repository-image]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
-[license-shield]: https://img.shields.io/github/license/{{ $repo }}.svg
+[license-shield]: https://img.shields.io/github/license/rigerc/home-assistant-addons.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-production%20ready-brightgreen.svg
-{{- range $addons }}
-[addon-{{ .slug }}]: {{ $repo_url }}/tree/{{.slug}}-{{ .version }}
-[addon-doc-{{ .slug }}]: {{ $repo_url }}/blob/{{.slug}}-{{ .version }}/README.md
-[{{ .slug }}-version-shield]: https://img.shields.io/badge/version-{{ .version | strings.ReplaceAll "-" "--" }}-blue.svg
-{{- $addon := . }}
-{{- range $arch }}
-{{- if has $addon.arch . }}
-[{{ $addon.slug }}-{{ . }}-shield]: https://img.shields.io/badge/{{ . }}-yes-green.svg
-{{- else }}
-[{{ $addon.slug }}-{{ . }}-shield]: https://img.shields.io/badge/{{ . }}-no-red.svg
-{{- end }}
-{{- end }}
-{{- end }}
+[addon-romm]: https://github.com/rigerc/home-assistant-addons/tree/romm-0.1.0
+[addon-doc-romm]: https://github.com/rigerc/home-assistant-addons/blob/romm-0.1.0/README.md
+[romm-version-shield]: https://img.shields.io/badge/version-0.1.0-blue.svg
+[romm-aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
+[romm-amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
+[romm-armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
+[romm-armv7-shield]: https://img.shields.io/badge/armv7-no-red.svg
