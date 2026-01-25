@@ -14,6 +14,11 @@ COPY --from=romm-base /romm /romm
 # Copy rootfs (initialization scripts)
 COPY rootfs /
 
+# Set permissions on scripts
+RUN chmod a+x /etc/cont-init.d/romm.sh \
+    && chmod a+x /etc/services.d/romm/run \
+    && chmod a+x /etc/services.d/romm/finish
+
 # Set working directory
 WORKDIR /romm
 
