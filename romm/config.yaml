@@ -23,7 +23,7 @@ ports_description:
   8080/tcp: Romm Web UI (disabled - use ingress)
 map:
   - share
-  - config
+  - addon_config:rw
 options:
   log_level: info
   database:
