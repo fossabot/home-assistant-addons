@@ -66,6 +66,12 @@ server {
         add_header Cache-Control "public";
     }
 
+    # Internal location for X-Accel-Redirect ROM downloads
+    location /library/ {
+        internal;
+        alias ${ROMM_BASE_PATH}/library/;
+    }
+
     # Health check
     location /health {
         proxy_pass http://unix:/tmp/gunicorn.sock:/health;

@@ -20,6 +20,7 @@ bashio::log.info "Creating data directories..."
 mkdir -p /data/romm_resources
 mkdir -p /data/redis_data
 mkdir -p /data/romm_assets
+mkdir -p /romm
 
 # Get library path from config
 LIBRARY_PATH="$(bashio::config 'library_path')"
@@ -27,6 +28,54 @@ if [ ! -d "$LIBRARY_PATH" ]; then
     bashio::log.warning "Library path ${LIBRARY_PATH} does not exist. Creating..."
     mkdir -p "$LIBRARY_PATH"
 fi
+
+# Create symlinks for ROMM to access our data directories
+# ROMM backend expects paths under /romm/* but we store data in HA-specific locations
+bashio::log.info "Creating symlinks for ROMM data paths..."
+
+# Remove old symlinks if they exist and point to wrong location
+for target_name in library resources assets; do
+    symlink_path="/romm/${target_name}"
+    if [ -L "$symlink_path" ]; then
+        rm "$symlink_path"
+    elif [ -e "$symlink_path" ]; then
+        bashio::log.warning "${symlink_path} exists but is not a symlink, removing..."
+        rm -rf "$symlink_path"
+    fi
+done
+
+# Create fresh symlinks
+ln -s "$LIBRARY_PATH" /romm/library
+ln -s /data/romm_resources /romm/resources
+ln -s /data/romm_assets /romm/assets
+
+bashio::log.info "Symlinks created: /romm/library -> ${LIBRARY_PATH}"
+
+# Fix frontend symlinks (similar to official ROMM entrypoint.sh)
+# Frontend needs symlinks in /var/www/html/assets/romm/ pointing to ROMM_BASE_PATH
+bashio::log.info "Verifying frontend asset symlinks..."
+mkdir -p /var/www/html/assets/romm
+
+for subfolder in assets resources; do
+    frontend_symlink="/var/www/html/assets/romm/${subfolder}"
+    expected_target="/romm/${subfolder}"
+
+    if [ -L "$frontend_symlink" ]; then
+        current_target=$(readlink "$frontend_symlink")
+        if [ "$current_target" != "$expected_target" ]; then
+            bashio::log.info "Updating frontend symlink: ${frontend_symlink} -> ${expected_target}"
+            rm "$frontend_symlink"
+            ln -s "$expected_target" "$frontend_symlink"
+        fi
+    else
+        if [ -e "$frontend_symlink" ]; then
+            bashio::log.warning "${frontend_symlink} exists but is not a symlink, removing..."
+            rm -rf "$frontend_symlink"
+        fi
+        bashio::log.info "Creating frontend symlink: ${frontend_symlink} -> ${expected_target}"
+        ln -s "$expected_target" "$frontend_symlink"
+    fi
+done
 
 # Helper function to export environment variables for s6 services
 export_env() {
@@ -74,12 +123,6 @@ export_env HASHEOUS_API_ENABLED "$(bashio::config 'metadata_providers.hasheous_e
 export_env PLAYMATCH_API_ENABLED "$(bashio::config 'metadata_providers.playmatch_enabled')"
 export_env LAUNCHBOX_API_ENABLED "$(bashio::config 'metadata_providers.launchbox_enabled')"
 
-# Export volume paths
-export_env ROMM_RESOURCES_PATH "/data/romm_resources"
-export_env REDIS_DATA_PATH "/data/redis_data"
-export_env ROMM_LIBRARY_PATH "$(bashio::config 'library_path')"
-export_env ROMM_ASSETS_PATH "/data/romm_assets"
-
 # Export Redis connection URL
 export_env REDIS_URL "redis://127.0.0.1:6379/0"
 
@@ -95,7 +138,7 @@ export_env ENABLE_RESCAN_ON_FILESYSTEM_CHANGE "true"
 
 # Export nginx configuration
 export_env ROMM_PORT "$(bashio::config 'port')"
-export_env ROMM_BASE_PATH "/"
+export_env ROMM_BASE_PATH "/romm"
 
 # Optional: config.yml path
 if [ -f "/config/romm/config.yml" ]; then
