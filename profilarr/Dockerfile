@@ -1,41 +1,21 @@
 ARG BUILD_FROM
-FROM ${BUILD_FROM}
+FROM dictionarry/profilarr:beta AS profilarr-base
+FROM ${BUILD_FROM} AS final
 
 # Install runtime dependencies
-# - git: For Git version control operations
-# - nodejs npm: For frontend build
+# - git: For Git version control operations (already in base image)
 # - bash: For shell scripts
 # - curl: For health checks
 RUN apk add --no-cache \
-    git \
-    nodejs \
-    npm \
     bash \
     curl
 
-# Set working directory
-WORKDIR /profilarr
+# Copy application files from official Profilarr image
+COPY --from=profilarr-base /app /profilarr
 
-# Copy backend application
-COPY backend/app /profilarr/app
-COPY backend/requirements.txt /profilarr/
-
-# Install Python dependencies
-RUN pip3 install --no-cache-dir -r /profilarr/requirements.txt
-
-# Copy frontend files for build
-COPY frontend/package.json frontend/package-lock.json frontend/vite.config.js /profilarr/frontend/
-COPY frontend/src /profilarr/frontend/src
-COPY frontend/index.html /profilarr/frontend/
-COPY frontend/tailwind.config.js /profilarr/frontend/ 2>/dev/null || true
-COPY frontend/postcss.config.js /profilarr/frontend/ 2>/dev/null || true
-
-# Build frontend
-RUN cd /profilarr/frontend && \
-    npm install && \
-    npm run build && \
-    mkdir -p /profilarr/app/static && \
-    cp -r dist/* /profilarr/app/static/
+# Copy Python virtual environment and binaries from base image
+COPY --from=profilarr-base /usr/local/bin /usr/local/bin
+COPY --from=profilarr-base /usr/local/lib /usr/local/lib
 
 # Copy rootfs (s6 service scripts)
 COPY rootfs /
@@ -49,5 +29,6 @@ RUN chmod a+x /etc/cont-init.d/*.sh \
 ENV PYTHONPATH=/profilarr
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
+ENV FLASK_APP=/profilarr/main.py
 
 WORKDIR /profilarr
