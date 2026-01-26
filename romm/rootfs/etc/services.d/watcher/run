@@ -1,11 +1,5 @@
 #!/usr/bin/with-contenv bashio
 
-# Check if file watcher is enabled
-if [ "${ENABLE_RESCAN_ON_FILESYSTEM_CHANGE}" != "true" ]; then
-    bashio::log.info "File watcher is disabled. Skipping..."
-    exit 0
-fi
-
 bashio::log.info "Starting file watcher for ${ROMM_LIBRARY_PATH}..."
 
 cd /backend || bashio::exit.nok "Failed to change to /backend directory"

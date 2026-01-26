@@ -15,7 +15,7 @@ boot: manual
 url: https://github.com/rigerc/home-assistant-addons/tree/master/romm
 init: false
 ingress: true
-ingress_port: 8099
+ingress_port: 5055
 panel_icon: mdi:gamepad-variant
 map:
   - share:rw
@@ -42,8 +42,6 @@ options:
     launchbox_enabled: true
   library_path: "/share/roms"
   env_vars: []
-  # File watcher - rescan library when files change
-  enable_file_watcher: false
   # Scheduled tasks
   scheduled_tasks:
     enable_rescan: true
@@ -74,7 +72,6 @@ schema:
   library_path: str
   env_vars:
     - str?
-  enable_file_watcher: bool
   scheduled_tasks:
     enable_rescan: bool
     enable_switch_titledb: bool

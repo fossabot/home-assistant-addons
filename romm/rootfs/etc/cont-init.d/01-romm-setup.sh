@@ -90,8 +90,8 @@ export_env ENABLE_SCHEDULED_UPDATE_LAUNCHBOX_METADATA "$(bashio::config 'schedul
 export_env ENABLE_SCHEDULED_CONVERT_IMAGES_TO_WEBP "$(bashio::config 'scheduled_tasks.enable_image_conversion')"
 export_env ENABLE_SCHEDULED_RETROACHIEVEMENTS_PROGRESS_SYNC "$(bashio::config 'scheduled_tasks.enable_retroachievements_sync')"
 
-# Export file watcher configuration
-export_env ENABLE_RESCAN_ON_FILESYSTEM_CHANGE "$(bashio::config 'enable_file_watcher')"
+# Export file watcher configuration (always enabled)
+export_env ENABLE_RESCAN_ON_FILESYSTEM_CHANGE "true"
 
 # Export nginx configuration
 export_env ROMM_PORT "$(bashio::addon.ingress_port)"
