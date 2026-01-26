@@ -2,13 +2,12 @@
 name: "Profilarr"
 version: "0.1.0"
 slug: "profilarr"
-description: "Profile management for *arr applications (Sonarr, Radarr, Lidarr)"
+description: "Profile management for *arr applications"
 arch:
   - aarch64
   - amd64
 image: "ghcr.io/rigerc/ha-addons-profilarr-v1-{arch}"
 url: https://github.com/Sonarr/Sonarr
-startup: application
 boot: manual
 ingress: true
 ingress_port: 6099
@@ -19,10 +18,6 @@ map:
 options:
   log_level: info
   tz: UTC
-  git_user_name: "Profilarr"
-  git_user_email: "profilarr@dictionarry.com"
 schema:
   log_level: list(trace|debug|info|notice|warning|error|fatal)
   tz: str
-  git_user_name: str
-  git_user_email: str

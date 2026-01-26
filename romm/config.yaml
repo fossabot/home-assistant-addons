@@ -1,6 +1,6 @@
 ---
 name: "Romm"
-version: "0.1.23"
+version: "1.0.0"
 slug: "romm"
 description: |
   Self-hosted ROM collection manager and emulator launcher.
@@ -14,13 +14,16 @@ startup: system
 boot: manual
 url: https://github.com/rigerc/home-assistant-addons/tree/master/romm
 init: false
-ingress: true
-ingress_port: 5999
-panel_icon: mdi:gamepad-variant
+ports:
+  5999/tcp: 5999
+ports_description:
+  5999/tcp: ROMM web interface
+webui: "http://[HOST]:[PORT:5999]"
 map:
   - share:rw
   - addon_config:rw
 options:
+  port: 5999
   log_level: info
   database:
     host: "core-mariadb"
@@ -50,6 +53,7 @@ options:
     enable_image_conversion: true
     enable_retroachievements_sync: true
 schema:
+  port: "int(1024,65535)"
   log_level: list(trace|debug|info|notice|warning|error|fatal)
   database:
     host: str

@@ -2,10 +2,6 @@ server {
     listen ${ROMM_PORT};
     server_name _;
 
-    # Ingress security - only allow connections from Home Assistant Ingress
-    allow 172.30.32.2;
-    deny all;
-
     root /var/www/html;
     index index.html;
 
@@ -14,9 +10,9 @@ server {
     client_body_timeout 300s;
 
     # Frontend static files
-    location ${ROMM_BASE_PATH}/ {
+    location / {
         alias /var/www/html/;
-        try_files $uri $uri/ ${ROMM_BASE_PATH}/index.html;
+        try_files $uri $uri/ /index.html;
 
         # Cache static assets
         location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
@@ -26,7 +22,7 @@ server {
     }
 
     # API endpoints - proxy to gunicorn
-    location ${ROMM_BASE_PATH}/api/ {
+    location /api/ {
         proxy_pass http://unix:/tmp/gunicorn.sock:/api/;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -40,7 +36,7 @@ server {
     }
 
     # WebSocket support
-    location ${ROMM_BASE_PATH}/ws {
+    location /ws {
         proxy_pass http://unix:/tmp/gunicorn.sock:/ws;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -52,7 +48,7 @@ server {
     }
 
     # Netplay WebSocket
-    location ${ROMM_BASE_PATH}/netplay {
+    location /netplay {
         proxy_pass http://unix:/tmp/gunicorn.sock:/netplay;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
@@ -71,7 +67,7 @@ server {
     }
 
     # Health check
-    location ${ROMM_BASE_PATH}/health {
+    location /health {
         proxy_pass http://unix:/tmp/gunicorn.sock:/health;
         access_log off;
     }

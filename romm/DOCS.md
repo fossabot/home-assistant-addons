@@ -3,6 +3,59 @@
 Romm (ROM Manager) is a self-hosted web-based
 ROM collection manager and emulator launcher.
 
+## Network Configuration
+
+### Port Settings
+
+**Port** (default: 5999)
+- The network port for accessing the ROMM web interface
+- Change if port 5999 conflicts with other services
+- Valid range: 1024-65535
+- After changing, restart the add-on
+
+### Security Recommendations
+
+ROMM does not include built-in authentication beyond the application's user management system. For production use:
+
+1. **Internal Network Only**: Only expose on trusted internal networks
+2. **Reverse Proxy**: Use Traefik, nginx Proxy Manager, or similar with authentication layer
+3. **Authentication Proxy**: Consider Authelia, Keycloak, or similar for SSO
+4. **HTTPS**: Use valid SSL certificates via reverse proxy
+5. **Firewall**: Restrict access using firewall rules or VLAN isolation
+6. **Strong Passwords**: Use strong passwords for ROMM user accounts
+
+### Reverse Proxy Example (Traefik)
+
+If using Traefik as a reverse proxy with authentication:
+
+```yaml
+http:
+  routers:
+    romm:
+      rule: "Host(`romm.yourdomain.com`)"
+      service: romm
+      middlewares:
+        - authelia  # Or your authentication middleware
+      tls:
+        certResolver: letsencrypt
+  services:
+    romm:
+      loadBalancer:
+        servers:
+          - url: "http://YOUR_HA_IP:5999"
+```
+
+### Reverse Proxy Example (nginx Proxy Manager)
+
+1. Create a new Proxy Host
+2. Set Domain Name: `romm.yourdomain.com`
+3. Set Scheme: `http`
+4. Set Forward Hostname/IP: `YOUR_HA_IP`
+5. Set Forward Port: `5999`
+6. Enable SSL (recommended)
+7. Enable "Force SSL"
+8. Optionally add Access List for authentication
+
 ## Features
 
 - Scan and organize ROM collections across 400+ platforms
@@ -70,15 +123,21 @@ Configure API keys for metadata providers to get rich game information:
 
 Without IGDB credentials, some metadata features may not work properly.
 
-## First Run
+## First Run Setup
 
-- Install the add-on
-- Configure database connection
-- Set auth secret key
-- Start the add-on
-- Open the Web UI (via sidebar or Ingress)
-- Complete setup wizard with admin username/password
-- Start scanning your ROM library
+1. Install and configure the add-on
+2. Set required options:
+   - Database connection (host, port, name, user, password)
+   - Auth secret key (generate with: `openssl rand -hex 32`)
+   - Library path (default: `/share/roms`)
+3. Optional: Configure metadata provider API keys
+4. Optional: Change port if 5999 conflicts (default: 5999)
+5. Start the add-on
+6. Open Web UI: `http://YOUR_HA_IP:5999` (or click "Open Web UI" button in add-on interface)
+7. Complete setup wizard:
+   - Create admin username and password
+   - Configure library scan settings
+8. Start scanning your ROM library
 
 ## Support
 

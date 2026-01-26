@@ -23,16 +23,16 @@ for i in {1..30}; do
         break
     fi
 
-    if [ $i -eq 5 ]; then
+    if [ "$i -eq 5" ]; then
         bashio::log.info "Still waiting for Valkey... (${i}s)"
     fi
 
-    if [ $i -eq 30 ]; then
+    if [ "$i -eq 30" ]; then
         bashio::log.error "Valkey failed to respond after 30 seconds"
         bashio::log.error "Checking if process is running:"
-        ps aux | grep valkey || true
+        ps aux | pgrep valkey || true
         bashio::log.error "Checking port 6379:"
-        netstat -tlnp | grep 6379 || true
+        netstat -tlnp | pgrep 6379 || true
         bashio::log.error "Testing Python connection:"
         python3 -c "import socket; s=socket.socket(); s.settimeout(1); s.connect(('127.0.0.1', 6379)); s.send(b'PING\r\n'); print('Response:', s.recv(1024)); s.close()" || true
         bashio::exit.nok "Valkey failed to start after 30 seconds"

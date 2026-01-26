@@ -10,13 +10,31 @@ Romm (ROM Manager) is a self-hosted web-based ROM collection manager and emulato
 
 1. Add this repository to your Home Assistant add-on store
 2. Install the Romm add-on
-3. Configure the add-on (see Configuration section)
+3. Configure the add-on (see Configuration section below)
 4. Start the add-on
-5. Access via Home Assistant sidebar
+5. Access via `http://YOUR_HA_IP:5999` (replace YOUR_HA_IP with your Home Assistant IP address)
+
+## Network Access
+
+This add-on exposes a web interface on port 5999 (configurable). The interface is accessible from your local network.
+
+**Security Recommendations:**
+- Do NOT expose this port directly to the internet
+- Use a reverse proxy with authentication if external access is needed (Traefik, nginx Proxy Manager)
+- Consider using Home Assistant authentication proxy add-ons (Authelia, etc.)
+- Ensure your Home Assistant instance is on a trusted network
+- Use firewall rules or VLAN isolation to restrict access
 
 ## Configuration
 
 See the [documentation](DOCS.md) for detailed configuration instructions.
+
+### Port Settings
+
+- **Port**: The port to expose the web interface on (default: 5999)
+  - Change this if port 5999 is already in use on your system
+  - Must be between 1024 and 65535
+  - After changing, access via `http://YOUR_HA_IP:NEW_PORT`
 
 ### Required Settings
 
