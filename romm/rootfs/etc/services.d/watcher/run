@@ -1,18 +1,15 @@
 #!/usr/bin/with-contenv bashio
 
 # Check if file watcher is enabled
-if [ "$(bashio::config 'enable_file_watcher')" != "true" ]; then
+if [ "${ENABLE_RESCAN_ON_FILESYSTEM_CHANGE}" != "true" ]; then
     bashio::log.info "File watcher is disabled. Skipping..."
     exit 0
 fi
 
-bashio::log.info "Starting file watcher..."
+bashio::log.info "Starting file watcher for ${ROMM_LIBRARY_PATH}..."
 
 cd /backend || bashio::exit.nok "Failed to change to /backend directory"
 
-# Run watchfiles command
-exec watchfiles \
-    "python" \
-    /backend \
-    --pattern "*.py" \
-    --pidfile /tmp/watcher.pid
+# Run watchfiles command to monitor library and trigger rescan on changes
+# Usage: watchfiles "command" "path"
+exec watchfiles "python -c 'from rq import Queue; q = Queue(); q.enqueue(\"romm.tasks.scan_roms\")'" "${ROMM_LIBRARY_PATH}"
