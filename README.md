@@ -35,7 +35,7 @@ This repository contains the following add-ons:
 ![Supports aarch64 Architecture][profilarr-aarch64-shield]
 ![Supports amd64 Architecture][profilarr-amd64-shield]
 
-Profile management for *arr applications (Sonarr, Radarr, Lidarr)
+Profile management for *arr applications
 [:books: Profilarr add-on documentation][addon-doc-profilarr]
 
 ### &#10003; [Romm][addon-romm]
@@ -90,9 +90,9 @@ SOFTWARE.
 [profilarr-amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [profilarr-armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
 [profilarr-armv7-shield]: https://img.shields.io/badge/armv7-no-red.svg
-[addon-romm]: https://github.com/rigerc/home-assistant-addons/tree/romm-0.1.23
-[addon-doc-romm]: https://github.com/rigerc/home-assistant-addons/blob/romm-0.1.23/README.md
-[romm-version-shield]: https://img.shields.io/badge/version-0.1.23-blue.svg
+[addon-romm]: https://github.com/rigerc/home-assistant-addons/tree/romm-0.1.24
+[addon-doc-romm]: https://github.com/rigerc/home-assistant-addons/blob/romm-0.1.24/README.md
+[romm-version-shield]: https://img.shields.io/badge/version-0.1.24-blue.svg
 [romm-aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [romm-amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [romm-armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
