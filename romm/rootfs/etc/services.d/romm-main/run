@@ -16,7 +16,7 @@ else
 fi
 
 exec gunicorn ${APP_MODULE} \
-    --bind "0.0.0.0:${ROMM_PORT:-8099}" \
+    --bind "0.0.0.0:${ROMM_PORT:-8019}" \
     --worker-class uvicorn_worker.UvicornWorker \
     --workers 1 \
     --timeout 300 \
