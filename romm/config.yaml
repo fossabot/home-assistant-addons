@@ -18,7 +18,7 @@ ingress: true
 ingress_port: 8095
 panel_icon: mdi:gamepad-variant
 ports:
-  8095/tcp: 8095
+  8095/tcp: 8080
 ports_description:
   8095/tcp: Romm Web UI
 map:
@@ -46,6 +46,15 @@ options:
     launchbox_enabled: true
   library_path: "/share/roms"
   env_vars: []
+  # File watcher - rescan library when files change
+  enable_file_watcher: false
+  # Scheduled tasks
+  scheduled_tasks:
+    enable_rescan: true
+    enable_switch_titledb: true
+    enable_launchbox_metadata: true
+    enable_image_conversion: true
+    enable_retroachievements_sync: true
 schema:
   log_level: list(trace|debug|info|notice|warning|error|fatal)
   database:
@@ -69,3 +78,10 @@ schema:
   library_path: str
   env_vars:
     - str?
+  enable_file_watcher: bool
+  scheduled_tasks:
+    enable_rescan: bool
+    enable_switch_titledb: bool
+    enable_launchbox_metadata: bool
+    enable_image_conversion: bool
+    enable_retroachievements_sync: bool

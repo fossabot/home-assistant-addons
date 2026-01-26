@@ -1,0 +1,18 @@
+#!/usr/bin/with-contenv bashio
+
+# Check if file watcher is enabled
+if [ "$(bashio::config 'enable_file_watcher')" != "true" ]; then
+    bashio::log.info "File watcher is disabled. Skipping..."
+    exit 0
+fi
+
+bashio::log.info "Starting file watcher..."
+
+cd /backend || bashio::exit.nok "Failed to change to /backend directory"
+
+# Run watchfiles command
+exec watchfiles \
+    "python" \
+    /backend \
+    --pattern "*.py" \
+    --pidfile /tmp/watcher.pid

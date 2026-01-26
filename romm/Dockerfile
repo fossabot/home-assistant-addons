@@ -15,6 +15,8 @@ COPY --from=romm-base /usr/local/lib/python3.13 /usr/local/lib/python3.13
 # - p7zip: 7zip archive support
 # - tzdata: Timezone data
 # - valkey: Redis-compatible in-memory data store (for background jobs)
+# - nginx: Web server for serving frontend and proxying to backend
+# - py3-pip: For installing additional Python packages
 # Python runtime dependencies:
 # - libffi: Foreign Function Interface library (needed by Python ctypes)
 # - libgcc: GCC runtime library (needed by Python)
@@ -32,6 +34,8 @@ RUN apk add --no-cache \
     tzdata \
     libmagic \
     valkey \
+    nginx \
+    py3-pip \
     libffi \
     libgcc \
     zlib \
@@ -50,6 +54,12 @@ COPY --from=romm-base /backend /backend
 # Copy RAHasher binary for RetroAchievements support
 COPY --from=romm-base /usr/bin/RAHasher /usr/bin/RAHasher
 
+# Copy nginx configuration and frontend files from base image
+COPY --from=romm-base /var/www/html /var/www/html
+COPY --from=romm-base /etc/nginx /etc/nginx
+COPY --from=romm-base /usr/lib/nginx/modules /usr/lib/nginx/modules
+COPY --from=romm-base /usr/sbin/nginx /usr/sbin/nginx
+
 # Create romm directory structure
 RUN mkdir -p /romm /redis-data && \
     chmod 755 /romm /redis-data
@@ -58,9 +68,7 @@ RUN mkdir -p /romm /redis-data && \
 COPY rootfs /
 
 # Set permissions
-RUN chmod a+x /etc/cont-init.d/*.sh \
-    && chmod a+x /etc/services.d/romm/run \
-    && chmod a+x /etc/services.d/romm/finish
+RUN chmod a+x /etc/cont-init.d/*.sh
 
 # Set environment for Python
 ENV PATH="/src/.venv/bin:${PATH}"
