@@ -7,6 +7,7 @@ arch:
   - aarch64
   - amd64
   - armv7
+image: "ghcr.io/rigerc/ha-addons-profilarr-v1-{arch}"
 url: https://github.com/Sonarr/Sonarr
 startup: application
 boot: manual
