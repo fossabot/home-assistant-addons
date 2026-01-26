@@ -80,6 +80,9 @@ export_env REDIS_DATA_PATH "/data/redis_data"
 export_env ROMM_LIBRARY_PATH "$(bashio::config 'library_path')"
 export_env ROMM_ASSETS_PATH "/data/romm_assets"
 
+# Export Redis connection URL
+export_env REDIS_URL "redis://127.0.0.1:6379/0"
+
 # Export scheduled tasks configuration
 export_env ENABLE_SCHEDULED_RESCAN "$(bashio::config 'scheduled_tasks.enable_rescan')"
 export_env ENABLE_SCHEDULED_UPDATE_SWITCH_TITLEDB "$(bashio::config 'scheduled_tasks.enable_switch_titledb')"
