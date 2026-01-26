@@ -1,5 +1,5 @@
 ARG BUILD_FROM
-FROM dictionarry/profilarr:beta AS profilarr-base
+FROM santiagosayshey/profilarr:latest AS profilarr-base
 FROM ${BUILD_FROM} AS final
 
 # Install runtime dependencies
