@@ -1,9 +1,18 @@
 #!/usr/bin/with-contenv bashio
 
-bashio::log.info "Starting internal valkey..."
-
-exec valkey-server \
-    --dir /data/redis_data \
-    --daemonize no \
-    --loglevel warning \
-    --pidfile /tmp/valkey-server.pid
+# Check if Valkey is already running from init script
+if valkey-cli -h 127.0.0.1 -p 6379 ping >/dev/null 2>&1; then
+    bashio::log.info "Valkey already running, monitoring existing instance..."
+    # Keep service alive by monitoring the existing process
+    while valkey-cli -h 127.0.0.1 -p 6379 ping >/dev/null 2>&1; do
+        sleep 5
+    done
+    bashio::exit.nok "Valkey stopped unexpectedly"
+else
+    bashio::log.info "Starting internal valkey..."
+    exec valkey-server \
+        --dir /data/redis_data \
+        --daemonize no \
+        --loglevel warning \
+        --pidfile /tmp/valkey-server.pid
+fi
