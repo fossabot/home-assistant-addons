@@ -2,16 +2,31 @@
 
 # Start Valkey in background for migrations
 bashio::log.info "Starting Valkey for database migrations..."
-valkey-server --dir /data/redis_data --daemonize yes --loglevel warning --pidfile /tmp/valkey-init.pid
+
+# Ensure redis data directory exists and has correct permissions
+mkdir -p /data/redis_data
+chmod 755 /data/redis_data
+
+# Start Valkey with error output
+if ! valkey-server --dir /data/redis_data --daemonize yes --loglevel warning --pidfile /tmp/valkey-init.pid 2>&1 | tee /tmp/valkey-error.log; then
+    bashio::log.error "Failed to start Valkey. Error log:"
+    cat /tmp/valkey-error.log
+    bashio::exit.nok "Valkey startup failed"
+fi
 
 # Wait for Valkey to be ready
 bashio::log.info "Waiting for Valkey to be ready..."
 for i in {1..30}; do
     if valkey-cli -h 127.0.0.1 -p 6379 ping >/dev/null 2>&1; then
-        bashio::log.info "Valkey is ready"
+        bashio::log.info "Valkey is ready after ${i} seconds"
         break
     fi
     if [ $i -eq 30 ]; then
+        bashio::log.error "Valkey failed to respond after 30 seconds"
+        bashio::log.error "Checking if process is running:"
+        ps aux | grep valkey || true
+        bashio::log.error "Checking port 6379:"
+        netstat -tlnp | grep 6379 || true
         bashio::exit.nok "Valkey failed to start after 30 seconds"
     fi
     sleep 1
