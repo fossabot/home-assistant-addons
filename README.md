@@ -83,13 +83,13 @@ SOFTWARE.
 [license-shield]: https://img.shields.io/github/license/rigerc/home-assistant-addons.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-production%20ready-brightgreen.svg
-[addon-profilarr]: https://github.com/rigerc/home-assistant-addons/tree/profilarr-1.0.0
-[addon-doc-profilarr]: https://github.com/rigerc/home-assistant-addons/blob/profilarr-1.0.0/README.md
-[profilarr-version-shield]: https://img.shields.io/badge/version-1.0.0-blue.svg
+[addon-profilarr]: https://github.com/rigerc/home-assistant-addons/tree/profilarr-0.1.0
+[addon-doc-profilarr]: https://github.com/rigerc/home-assistant-addons/blob/profilarr-0.1.0/README.md
+[profilarr-version-shield]: https://img.shields.io/badge/version-0.1.0-blue.svg
 [profilarr-aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [profilarr-amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [profilarr-armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
-[profilarr-armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
+[profilarr-armv7-shield]: https://img.shields.io/badge/armv7-no-red.svg
 [addon-romm]: https://github.com/rigerc/home-assistant-addons/tree/romm-0.1.23
 [addon-doc-romm]: https://github.com/rigerc/home-assistant-addons/blob/romm-0.1.23/README.md
 [romm-version-shield]: https://img.shields.io/badge/version-0.1.23-blue.svg

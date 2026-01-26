@@ -2,9 +2,16 @@
 
 All notable changes to the Profilarr add-on will be documented in this file.
 
+## Profilarr 0.1.0 - 2026-01-26
+
+### Changes
+
+- No changes
+
 ## [1.0.0] - 2026-01-26
 
 ### Added
+
 - Initial release of Profilarr Home Assistant add-on
 - Profile management for Sonarr, Radarr, and Lidarr
 - Git-based version control for configurations
