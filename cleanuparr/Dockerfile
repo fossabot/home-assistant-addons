@@ -13,7 +13,7 @@ RUN apk add --no-cache \
 # Download and install Cleanuparr binary
 RUN set -ex; \
     case "${TARGETARCH}" in \
-        amd64) BINARY_ARCH="x64" ;; \
+        amd64) BINARY_ARCH="amd64" ;; \
         arm64) BINARY_ARCH="arm64" ;; \
         arm/v7) BINARY_ARCH="arm" ;; \
         *) echo "Unsupported architecture: ${TARGETARCH}" && exit 1 ;; \
@@ -22,9 +22,9 @@ RUN set -ex; \
     echo "Downloading Cleanuparr v${CLEANUPARR_VERSION} for ${BINARY_ARCH}..."; \
     curl -fsSL "${DOWNLOAD_URL}" -o /tmp/cleanuparr.zip; \
     unzip /tmp/cleanuparr.zip -d /tmp/; \
-    mv /tmp/Cleanuparr /usr/bin/cleanuparr; \
+    mv "/tmp/Cleanuparr-${CLEANUPARR_VERSION}-linux-${BINARY_ARCH}/Cleanuparr" /usr/bin/cleanuparr; \
     chmod +x /usr/bin/cleanuparr; \
-    rm -f /tmp/cleanuparr.zip
+    rm -rf /tmp/cleanuparr.zip "/tmp/Cleanuparr-${CLEANUPARR_VERSION}-linux-${BINARY_ARCH}"
 
 # Copy root filesystem (s6-overlay service scripts)
 COPY rootfs /
