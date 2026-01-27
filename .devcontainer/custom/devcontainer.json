@@ -10,17 +10,11 @@
     "WORKSPACE_DIRECTORY": "${containerWorkspaceFolder}",
     "COSIGN_VERSION": "2.4.0",
     "OS_AGENT_VERSION": "1.7.2",
+    "TZ": "Europe/Ljubljana"
   },
   "customizations": {
     "vscode": {
-      "extensions": [
-        "timonwong.shellcheck",
-        "esbenp.prettier-vscode",
-        "spmeesseman.vscode-taskexplorer",
-        "ms-azuretools.vscode-containers",
-        "DavidAnson.vscode-markdownlint",
-        "GitHub.vscode-pull-request-github"
-      ],
+      "extensions": ["timonwong.shellcheck", "esbenp.prettier-vscode"],
       "settings": {
         "terminal.integrated.profiles.linux": {
           "zsh": {
