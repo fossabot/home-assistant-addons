@@ -132,7 +132,7 @@ apparmor: true
 # Image (for pre-built containers)
 # Commented out to force local builds during development
 # Uncomment and set correct image for production builds
-# image: "ghcr.io/your-username/{arch}-addon-cleanuparr"
+image: "ghcr.io/rigerc/ha-addons-cleanuparr-{arch}"
 
 # Codenotary (code signing)
 # Uncomment and set your signing email
