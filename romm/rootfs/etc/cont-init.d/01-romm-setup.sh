@@ -137,7 +137,8 @@ export_env ENABLE_SCHEDULED_RETROACHIEVEMENTS_PROGRESS_SYNC "$(bashio::config 's
 export_env ENABLE_RESCAN_ON_FILESYSTEM_CHANGE "true"
 
 # Export nginx configuration
-export_env ROMM_PORT "$(bashio::config 'port')"
+# Get the actual mapped port from config.yaml (not user-configurable)
+export_env ROMM_PORT "$(bashio::addon.port '5999/tcp')"
 export_env ROMM_BASE_PATH "/romm"
 
 # Optional: config.yml path

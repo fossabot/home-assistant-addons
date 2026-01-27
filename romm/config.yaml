@@ -23,7 +23,6 @@ map:
   - share:rw
   - addon_config:rw
 options:
-  port: 5999
   log_level: info
   database:
     host: "core-mariadb"
@@ -53,7 +52,6 @@ options:
     enable_image_conversion: true
     enable_retroachievements_sync: true
 schema:
-  port: "int(1024,65535)"
   log_level: list(trace|debug|info|notice|warning|error|fatal)
   database:
     host: str

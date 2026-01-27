@@ -16,7 +16,7 @@ Romm (ROM Manager) is a self-hosted web-based ROM collection manager and emulato
 
 ## Network Access
 
-This add-on exposes a web interface on port 5999 (configurable). The interface is accessible from your local network.
+This add-on exposes a web interface on **port 5999** (fixed). The interface is accessible from your local network.
 
 **Security Recommendations:**
 - Do NOT expose this port directly to the internet
@@ -28,13 +28,6 @@ This add-on exposes a web interface on port 5999 (configurable). The interface i
 ## Configuration
 
 See the [documentation](DOCS.md) for detailed configuration instructions.
-
-### Port Settings
-
-- **Port**: The port to expose the web interface on (default: 5999)
-  - Change this if port 5999 is already in use on your system
-  - Must be between 1024 and 65535
-  - After changing, access via `http://YOUR_HA_IP:NEW_PORT`
 
 ### Required Settings
 

@@ -5,13 +5,11 @@ ROM collection manager and emulator launcher.
 
 ## Network Configuration
 
-### Port Settings
+### Port
 
-**Port** (default: 5999)
-- The network port for accessing the ROMM web interface
-- Change if port 5999 conflicts with other services
-- Valid range: 1024-65535
-- After changing, restart the add-on
+ROMM uses **port 5999** (fixed) for the web interface. This port is mapped by Home Assistant and cannot be changed through add-on configuration.
+
+If port 5999 conflicts with another service, you'll need to change the other service's port or use a reverse proxy to expose ROMM on a different port externally.
 
 ### Security Recommendations
 
@@ -131,8 +129,7 @@ Without IGDB credentials, some metadata features may not work properly.
    - Auth secret key (generate with: `openssl rand -hex 32`)
    - Library path (default: `/share/roms`)
 3. Optional: Configure metadata provider API keys
-4. Optional: Change port if 5999 conflicts (default: 5999)
-5. Start the add-on
+4. Start the add-on
 6. Open Web UI: `http://YOUR_HA_IP:5999` (or click "Open Web UI" button in add-on interface)
 7. Complete setup wizard:
    - Create admin username and password
