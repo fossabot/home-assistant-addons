@@ -1,4 +1,4 @@
-# bluemaex's Add-ons Shack
+# riger's Home Assistant Add-ons
 
 ![Project Stage][project-stage-shield]
 ![Maintenance][maintenance-shield]
@@ -7,7 +7,7 @@
 ## About
 
 Home Assistant allows anyone to create add-on repositories to share their
-add-ons for Home Assistant easily. This repository contains my personal,
+add-ons for Home Assistant easily. This repository contains my personal, experimental
 but free to use [Home Assistant Add-ons][ha-addons].
 
 [![Add Repository Link][add-repository-image]][add-repository-button]
@@ -30,19 +30,15 @@ This repository contains the following add-ons:
 ### &#10003; [Cleanuparr][addon-cleanuparr]
 
 ![Latest Version][cleanuparr-version-shield]
-![Supports armhf Architecture][cleanuparr-armhf-shield]
-![Supports armv7 Architecture][cleanuparr-armv7-shield]
 ![Supports aarch64 Architecture][cleanuparr-aarch64-shield]
 ![Supports amd64 Architecture][cleanuparr-amd64-shield]
 
-Automated cleanup for Sonarr, Radarr, Lidarr, Readarr, and Whisparr downloads. Remove stalled, slow, failed imports, and malware torrents.
+Automated cleanup for Sonarr, Radarr, Lidarr, Readarr, and Whisparr downloads. Remove stalled, slow, failed imports, and malware torrents. Automatic search replacement and seeding management.
 [:books: Cleanuparr add-on documentation][addon-doc-cleanuparr]
 
 ### &#10003; [Profilarr][addon-profilarr]
 
 ![Latest Version][profilarr-version-shield]
-![Supports armhf Architecture][profilarr-armhf-shield]
-![Supports armv7 Architecture][profilarr-armv7-shield]
 ![Supports aarch64 Architecture][profilarr-aarch64-shield]
 ![Supports amd64 Architecture][profilarr-amd64-shield]
 
@@ -52,8 +48,6 @@ Profile management for *arr applications
 ### &#10003; [Romm][addon-romm]
 
 ![Latest Version][romm-version-shield]
-![Supports armhf Architecture][romm-armhf-shield]
-![Supports armv7 Architecture][romm-armv7-shield]
 ![Supports aarch64 Architecture][romm-aarch64-shield]
 ![Supports amd64 Architecture][romm-amd64-shield]
 
@@ -94,13 +88,13 @@ SOFTWARE.
 [license-shield]: https://img.shields.io/github/license/rigerc/home-assistant-addons.svg
 [maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-production%20ready-brightgreen.svg
-[addon-cleanuparr]: https://github.com/rigerc/home-assistant-addons/tree/cleanuparr-0.1.3
-[addon-doc-cleanuparr]: https://github.com/rigerc/home-assistant-addons/blob/cleanuparr-0.1.3/README.md
-[cleanuparr-version-shield]: https://img.shields.io/badge/version-0.1.3-blue.svg
+[addon-cleanuparr]: https://github.com/rigerc/home-assistant-addons/tree/cleanuparr-0.2.0
+[addon-doc-cleanuparr]: https://github.com/rigerc/home-assistant-addons/blob/cleanuparr-0.2.0/README.md
+[cleanuparr-version-shield]: https://img.shields.io/badge/version-0.2.0-blue.svg
 [cleanuparr-aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
 [cleanuparr-amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [cleanuparr-armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
-[cleanuparr-armv7-shield]: https://img.shields.io/badge/armv7-no-red.svg
+[cleanuparr-armv7-shield]: https://img.shields.io/badge/armv7-yes-green.svg
 [addon-profilarr]: https://github.com/rigerc/home-assistant-addons/tree/profilarr-0.1.7
 [addon-doc-profilarr]: https://github.com/rigerc/home-assistant-addons/blob/profilarr-0.1.7/README.md
 [profilarr-version-shield]: https://img.shields.io/badge/version-0.1.7-blue.svg
