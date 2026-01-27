@@ -3,7 +3,7 @@
 {{- $arch := .Env.ARCHITECTURES | jsonArray -}}
 {{- $addons := .Env.ADDONS_DATA | jsonArray -}}
 
-# bluemaex's Add-ons Shack
+# riger's Home Assistant Add-ons
 
 ![Project Stage][project-stage-shield]
 ![Maintenance][maintenance-shield]
@@ -12,7 +12,7 @@
 ## About
 
 Home Assistant allows anyone to create add-on repositories to share their
-add-ons for Home Assistant easily. This repository contains my personal,
+add-ons for Home Assistant easily. This repository contains my personal, experimental
 but free to use [Home Assistant Add-ons][ha-addons].
 
 [![Add Repository Link][add-repository-image]][add-repository-button]
@@ -35,8 +35,6 @@ This repository contains the following add-ons:
 ### &#10003; [{{ .name }}][addon-{{ .slug }}]
 
 ![Latest Version][{{ .slug }}-version-shield]
-![Supports armhf Architecture][{{ .slug }}-armhf-shield]
-![Supports armv7 Architecture][{{ .slug }}-armv7-shield]
 ![Supports aarch64 Architecture][{{ .slug }}-aarch64-shield]
 ![Supports amd64 Architecture][{{ .slug }}-amd64-shield]
 
