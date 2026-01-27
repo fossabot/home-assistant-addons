@@ -23,11 +23,11 @@ for i in {1..30}; do
         break
     fi
 
-    if [ "$i -eq 5" ]; then
+    if [ "$i" -eq 5 ]; then
         bashio::log.info "Still waiting for Valkey... (${i}s)"
     fi
 
-    if [ "$i -eq 30" ]; then
+    if [ "$i" -eq 30 ]; then
         bashio::log.error "Valkey failed to respond after 30 seconds"
         bashio::log.error "Checking if process is running:"
         ps aux | pgrep valkey || true

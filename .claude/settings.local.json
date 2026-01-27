@@ -3,7 +3,8 @@
     "allow": [
       "Bash(chmod:*)",
       "Bash(shellcheck:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "WebSearch"
     ]
   },
   "enableAllProjectMcpServers": true,
