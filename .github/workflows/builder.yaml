@@ -56,11 +56,14 @@ jobs:
     if: needs.init.outputs.addons != '[]'
     name: 👷‍♂️ Build ${{ matrix.addon }} for ${{ matrix.arch }}
     timeout-minutes: 120
+    permissions:
+      contents: read
+      packages: write
     strategy:
       fail-fast: false
       matrix:
         addon: ${{ fromJson(needs.init.outputs.addons) }}
-        arch: ["aarch64", "amd64", "armhf", "armv7", "i386"]
+        arch: ["aarch64", "amd64"]
     steps:
       - name: ⤵️ Check out repository
         uses: actions/checkout@v6.0.1
@@ -91,7 +94,7 @@ jobs:
             ${{ runner.os }}-buildx-${{ matrix.addon }}-
       - name: 🚀 Build ${{ matrix.addon }} add-on
         if: steps.check.outputs.build_arch == 'true'
-        uses: home-assistant/builder@2024.08.2
+        uses: home-assistant/builder@2025.11.0
         with:
           args: |
             --test \
