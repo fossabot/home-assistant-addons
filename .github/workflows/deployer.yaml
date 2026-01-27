@@ -16,58 +16,34 @@ on:
         required: true
         type: string
 
-# Prevent multiple releases of the same add-on from running simultaneously
-concurrency:
-  group: release-${{ inputs.addon }}
-  cancel-in-progress: false
-
-# Set default permissions for all jobs
-permissions:
-  contents: write
-  packages: write
-  id-token: write
-
 jobs:
   init:
-    timeout-minutes: 10
     runs-on: ubuntu-latest
-    name: Prepare ${{ inputs.addon }} Release
+    name: ⏳ Prepare ${{ inputs.addon }} Release
     outputs:
       release_name: ${{ steps.release_notes.outputs.name }}
       release_version: ${{ steps.values.outputs.release_version }}
       architectures: ${{ steps.info.outputs.architectures }}
       image: ${{ steps.values.outputs.image }}
     steps:
-      - name: Check out the repository
+      - name: ⤵️ Check out the repository
         uses: actions/checkout@v4.3.1
-      - name: Validate add-on exists
-        run: |
-          if [ ! -d "${{ inputs.addon }}" ]; then
-            echo "Error: Add-on '${{ inputs.addon }}' not found"
-            exit 1
-          fi
-          if [ ! -f "${{ inputs.addon }}/config.yaml" ]; then
-            echo "Error: config.yaml not found for '${{ inputs.addon }}'"
-            exit 1
-          fi
-      # Note: Using @master for home-assistant/actions helpers as the repo has no proper version tags
-      # (only v1.0.0 from 2020). The helpers are actively maintained on the master branch.
-      - name: Find add-on directories
+      - name: 🚀 Find add-on directories
         id: addons
         uses: home-assistant/actions/helpers/find-addons@master
-      - name: Get add-on information
+      - name: ℹ️ Get information
         id: info
         uses: home-assistant/actions/helpers/info@master
         with:
           path: "./${{ inputs.addon }}"
-      - name: Run Release Drafter
+      - name: 📝 Run Release Drafter
         uses: release-drafter/release-drafter@v6.2.0
         id: release_notes
         with:
           config-name: "release-drafter-${{ inputs.addon }}.yml"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Generate Build Values
+      - name: 🪚 Generate Build-Values
         id: values
         run: |
           date="$(date +"%Y-%m-%dT%H:%M:%SZ")"
@@ -77,14 +53,14 @@ jobs:
           echo "Add-on: ${{ inputs.addon }} Version: $version Date: $date"
           echo "release_date=$date" >> $GITHUB_OUTPUT
           echo "release_version=$version" >> $GITHUB_OUTPUT
-          echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT
-      - name: Update Config Files
+          echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
+      - name: ✍️ Update Config Files
         run: |
-          echo "Updating version in config.yaml"
+          echo "📦 Updating version in config.yaml"
           yq -i '.version = "${{ steps.values.outputs.release_version }}"' "${{ inputs.addon }}/config.yaml"
           head "${{ inputs.addon }}/config.yaml"
 
-          echo "Adding Docker Labels in build.yaml"
+          echo "🎁 Adding Docker Labels in config.yaml"
           yq -i '
             .labels."org.opencontainers.image.title" = "Home Assistant Unofficial Add-on: ${{ inputs.addon }}" |
             .labels."org.opencontainers.image.url" = "https://github.com/${{ github.repository }}" |
@@ -95,40 +71,45 @@ jobs:
             .labels."org.opencontainers.image.version" = "${{ steps.values.outputs.release_version }}"
           ' "${{ inputs.addon }}/build.yaml"
           cat "${{ inputs.addon }}/build.yaml"
-      - name: Update CHANGELOG.md
+      - name: 📝 Update CHANGELOG.md
         uses: stefanzweifel/changelog-updater-action@v1.12.0
         id: update_changelog
         with:
           latest-version: ${{ steps.release_notes.outputs.name }}
           release-notes: ${{ steps.release_notes.outputs.body }}
           path-to-changelog: ${{ inputs.addon }}/CHANGELOG.md
-      - name: Upload Release Artifacts
+      - name: Tar files
+        run: tar -cvf addon.tar ${{ inputs.addon }}
+      - name: ⤴️ Upload Release Artifacts
         uses: actions/upload-artifact@v4.6.2
         with:
           name: release-files
-          path: ${{ inputs.addon }}
+          path: addon.tar
 
   build:
-    timeout-minutes: 60
     needs: init
     runs-on: ubuntu-latest
-    name: Build ${{ matrix.arch }}
+    name: 👩‍💻 Build & Push ${{ matrix.arch }}
+    permissions:
+      packages: write
+      id-token: write
     strategy:
-      fail-fast: true
       matrix:
         arch: ${{ fromJson(needs.init.outputs.architectures) }}
     steps:
-      - name: Download Release Artifacts
+      - name: ⤵️ Download Release Artifacts
         uses: actions/download-artifact@v4.3.0
         with:
           name: release-files
-      - name: Login to GitHub Container Registry
+      - name: Untar artifacts
+        run: tar -xvf addon.tar ${{ inputs.addon }} && rm addon.tar
+      - name: 🏗  Login to GitHub Container Registry
         uses: docker/login-action@v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build ${{ inputs.addon }} add-on
+      - name: 🧱 Build ${{ inputs.addon }} add-on
         uses: home-assistant/builder@2024.08.2
         with:
           args: |
@@ -139,37 +120,30 @@ jobs:
             --addon
 
   release:
-    timeout-minutes: 10
     needs: ["init", "build"]
     runs-on: ubuntu-latest
-    name: Release ${{ needs.init.outputs.release_name }}
+    name: 🚀 Release ${{ needs.init.outputs.release_name }}
+    permissions:
+      contents: write
     steps:
-      - name: Check out the repository
+      - name: ⤵️ Check out the repository
         uses: actions/checkout@v4.3.1
-        with:
-          fetch-depth: 0
-      - name: Download Release Artifacts
+      - name: ⤵️ Download Release Artifacts
         uses: actions/download-artifact@v4.3.0
         with:
           name: release-files
-      - name: Copy updated files from artifacts
-        run: |
-          # Copy updated config files from artifacts to working directory
-          cp -r ${{ inputs.addon }}/config.yaml ${{ inputs.addon }}/config.yaml
-          cp -r ${{ inputs.addon }}/build.yaml ${{ inputs.addon }}/build.yaml
-          if [ -f "${{ inputs.addon }}/CHANGELOG.md" ]; then
-            cp -r ${{ inputs.addon }}/CHANGELOG.md ${{ inputs.addon }}/CHANGELOG.md
-          fi
-      - name: Update README.md
+      - name: Untar artifacts
+        run: tar -xvf addon.tar ${{ inputs.addon }} && rm addon.tar
+      - name: 📝 Update README.md
         uses: ./.github/actions/update-readme
         with:
           addons: ${{ inputs.addon }}
-      - name: Commit new Addon Config
+      - name: 🔧 Commit new Addon Config
         uses: stefanzweifel/git-auto-commit-action@v5.2.0
         with:
-          commit_message: Released ${{ needs.init.outputs.release_name }}
+          commit_message: 🚀 Released ${{ needs.init.outputs.release_name }}
           commit_user_email: actions@github.com
-      - name: Create Release
+      - name: 🚀 Create Release
         uses: release-drafter/release-drafter@v6.2.0
         with:
           config-name: "release-drafter-${{ inputs.addon }}.yml"

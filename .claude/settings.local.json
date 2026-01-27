@@ -4,7 +4,8 @@
       "Bash(chmod:*)",
       "Bash(shellcheck:*)",
       "Bash(tree:*)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(curl:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
