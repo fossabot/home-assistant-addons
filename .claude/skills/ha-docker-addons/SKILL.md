@@ -180,7 +180,155 @@ COPY rootfs /
 WORKDIR /data
 ```
 
-See `references/dockerfile-patterns.md` for additional patterns including LinuxServer.io image handling, architecture-specific builds, and binary extraction best practices.
+**Debug Logging Pattern**
+
+Add debug logging to the Dockerfile to track build progress and diagnose issues:
+
+```dockerfile
+ARG BUILD_FROM
+ARG BUILD_VERSION
+
+# Stage 1: Extract from upstream image
+FROM grafana/loki:${BUILD_VERSION} AS app-source
+
+# Stage 2: Build on Home Assistant base
+FROM ${BUILD_FROM}
+
+# Add debug logging to track build steps
+RUN echo "[BUILD] Installing runtime dependencies..." && \
+    apk add --no-cache \
+    ca-certificates \
+    gomplate && \
+    echo "[BUILD] Runtime dependencies installed successfully"
+
+# Add debug logging for binary copy
+RUN echo "[BUILD] Copying application binary from upstream..." && \
+    echo "[BUILD] Upstream version: ${BUILD_VERSION}" && \
+    echo "[BUILD] Target architecture: ${BUILD_ARCH}"
+
+COPY --from=app-source /usr/bin/loki /usr/bin/loki
+
+# Verify binary was copied successfully
+RUN echo "[BUILD] Verifying binary..." && \
+    ls -lh /usr/bin/loki && \
+    /usr/bin/loki --version && \
+    echo "[BUILD] Binary verified successfully"
+
+# Add debug logging for user creation
+RUN echo "[BUILD] Creating application user..." && \
+    adduser -D -H -u 999 -g loki loki && \
+    echo "[BUILD] User 'loki' created (UID: 999)"
+
+# Copy S6-overlay configuration with logging
+COPY rootfs /
+
+RUN echo "[BUILD] S6-overlay configuration copied" && \
+    find /etc/s6-overlay -type f | wc -l | xargs -I {} echo "[BUILD] {} S6 service files found"
+
+WORKDIR /data
+
+# Labels with debug info
+LABEL \
+  io.hass.version="${BUILD_VERSION}" \
+  io.hass.type="addon" \
+  io.hass.arch="${BUILD_ARCH}" \
+  io.hass.build.date="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+  io.hass.build.host="${HOSTNAME:-unknown}"
+
+# Final build summary
+RUN echo "[BUILD] Build completed successfully" && \
+    echo "[BUILD] Version: ${BUILD_VERSION}" && \
+    echo "[BUILD] Architecture: ${BUILD_ARCH}" && \
+    echo "[BUILD] Build date: $(date -u +'%Y-%m-%dT%H:%M:%SZ')"
+```
+
+**Conditional Debug Logging**
+
+Enable debug logging only when needed using build arguments:
+
+```dockerfile
+ARG BUILD_FROM
+ARG BUILD_VERSION
+ARG DEBUG_BUILD=false
+
+# Conditional debug function
+RUN if [ "${DEBUG_BUILD}" = "true" ]; then \
+      echo "[BUILD DEBUG] Build arguments:"; \
+      echo "  BUILD_FROM=${BUILD_FROM}"; \
+      echo "  BUILD_VERSION=${BUILD_VERSION}"; \
+      echo "  BUILD_ARCH=${BUILD_ARCH}"; \
+      echo "  DEBUG_BUILD=${DEBUG_BUILD}"; \
+    fi
+
+# Use debug logging for critical steps
+RUN echo "[BUILD] Extracting application..." && \
+    if [ "${DEBUG_BUILD}" = "true" ]; then \
+      echo "[BUILD DEBUG] Listing upstream image contents:"; \
+      ls -lh /usr/bin/ || true; \
+    fi && \
+    COPY --from=app-source /usr/bin/loki /usr/bin/loki && \
+    if [ "${DEBUG_BUILD}" = "true" ]; then \
+      echo "[BUILD DEBUG] Verifying binary:"; \
+      ls -lh /usr/bin/loki; \
+      file /usr/bin/loki; \
+    fi && \
+    echo "[BUILD] Application extracted successfully"
+```
+
+**Debug Build Usage**
+
+To enable debug logging during builds:
+
+```bash
+# Method 1: Pass DEBUG_BUILD argument
+docker build \
+  --build-arg BUILD_FROM="ghcr.io/home-assistant/amd64-base:latest" \
+  --build-arg BUILD_ARCH="amd64" \
+  --build-arg DEBUG_BUILD=true \
+  -t local/addon:debug \
+  .
+
+# Method 2: Add to build.yaml for all builds
+args:
+  DEBUG_BUILD: "true"
+
+# Method 3: Add specific stage debugging
+docker build \
+  --build-arg DEBUG_BUILD=true \
+  --target app-source \
+  -t local/upstream-inspect \
+  .
+```
+
+**Common Debug Logging Targets**
+
+```dockerfile
+# Debug variable expansion
+RUN echo "BUILD_VERSION=${BUILD_VERSION}"
+RUN echo "BUILD_ARCH=${BUILD_ARCH}"
+RUN echo "BUILD_FROM=${BUILD_FROM}"
+RUN printenv | grep BUILD_
+
+# Debug file operations
+RUN ls -lh /usr/bin/
+RUN file /usr/bin/loki
+RUN ldd /usr/bin/loki
+
+# debug network issues
+RUN apk add --no-cache curl && \
+    curl -v https://example.com && \
+    apk del curl
+
+# Debug disk space
+RUN df -h
+RUN du -sh /usr/*
+
+# Debug permissions
+RUN ls -la /data/
+RUN id
+```
+
+See `references/dockerfile-patterns.md` for additional patterns including LinuxServer.io image handling, architecture-specific builds, binary extraction best practices, and comprehensive debugging strategies.
 
 ### Step 4: Configure config.yaml
 

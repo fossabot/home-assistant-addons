@@ -41,7 +41,7 @@ COPY rootfs /
 RUN chmod +x /etc/s6-overlay/s6-rc.d/cleanuparr/run && \
     chmod +x /etc/s6-overlay/s6-rc.d/cleanuparr/finish
 
-WORKDIR /app
+WORKDIR /
 
 # Environment variables
 ENV DOTNET_USE_POLLING_FILE_WATCHER=true \
