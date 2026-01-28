@@ -6,7 +6,6 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
-      - "docker"
 
   - package-ecosystem: "docker"
     directory: "/cleanuparr"
@@ -14,7 +13,6 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
-      - "docker"
 
   - package-ecosystem: "docker"
     directory: "/profilarr"
@@ -22,4 +20,3 @@ updates:
       interval: "weekly"
     labels:
       - "dependencies"
-      - "docker"
