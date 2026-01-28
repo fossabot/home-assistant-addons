@@ -2,7 +2,7 @@ ARG BUILD_FROM
 FROM ${BUILD_FROM}
 
 # Build arguments
-ARG CLEANUPARR_VERSION
+ARG APP_VERSION
 ARG BUILD_ARCH
 ARG BUILD_DATE
 ARG BUILD_VERSION
@@ -15,84 +15,155 @@ LABEL \
   io.hass.dev="true" \
   org.opencontainers.image.title="Home Assistant Add-on: Cleanuparr" \
   org.opencontainers.image.description="Automated cleanup for Sonarr, Radarr, Lidarr, Readarr, and Whisparr downloads" \
-  org.opencontainers.image.version="${CLEANUPARR_VERSION}" \
+  org.opencontainers.image.version="${BUILD_VERSION}" \
   org.opencontainers.image.created="${BUILD_DATE}" \
   org.opencontainers.image.source="https://github.com/Cleanuparr/Cleanuparr" \
   org.opencontainers.image.licenses="Apache-2.0"
 
-# Install runtime dependencies
-# - curl: For downloading the Cleanuparr binary
-# - unzip: For extracting the downloaded archive
-# - ca-certificates: For SSL/TLS connections
+# =============================================================================
+# Install Runtime Dependencies
+# =============================================================================
 RUN \
+  echo "════════════════════════════════════════════════════════════════" && \
+  echo "  Home Assistant Add-on: Cleanuparr" && \
+  echo "  Version: ${BUILD_VERSION} / Cleanuparr: ${APP_VERSION}" && \
+  echo "  Architecture: ${BUILD_ARCH}" && \
+  echo "════════════════════════════════════════════════════════════════" && \
+  echo "" && \
+  echo "[1/4] Installing runtime dependencies..." && \
+  echo "→ Updating Alpine package index..." && \
   apk update && \
+  echo "→ Installing packages: curl, unzip, ca-certificates..." && \
   apk add --no-cache \
     curl \
     unzip \
     ca-certificates && \
-  update-ca-certificates
+  echo "→ Updating CA certificates..." && \
+  update-ca-certificates && \
+  echo "✓ Runtime dependencies installed successfully" && \
+  echo ""
 
-# Download and install Cleanuparr binary
-# The Cleanuparr project provides pre-built binaries for multiple architectures
+# =============================================================================
+# Download and Install Cleanuparr Binary
+# =============================================================================
 RUN \
+  echo "[2/4] Downloading and installing Cleanuparr binary..." && \
   set -ex && \
-  # Map Docker TARGETARCH to Cleanuparr's architecture naming
+  echo "→ Detecting architecture..." && \
   case "${BUILD_ARCH}" in \
     aarch64) \
       BINARY_ARCH="arm64" \
+      echo "  Mapped: aarch64 → arm64" \
       ;; \
     amd64) \
       BINARY_ARCH="amd64" \
+      echo "  Mapped: amd64 → amd64" \
       ;; \
     armv7) \
       BINARY_ARCH="arm" \
+      echo "  Mapped: armv7 → arm" \
       ;; \
     *) \
-      echo "Unsupported architecture: ${BUILD_ARCH}" && exit 1 \
+      echo "  ✗ Unsupported architecture: ${BUILD_ARCH}" && exit 1 \
       ;; \
   esac && \
-  # Download the Cleanuparr binary from GitHub releases
-  DOWNLOAD_URL="https://github.com/Cleanuparr/Cleanuparr/releases/download/v${CLEANUPARR_VERSION}/Cleanuparr-${CLEANUPARR_VERSION}-linux-${BINARY_ARCH}.zip" && \
-  echo "Downloading Cleanuparr v${CLEANUPARR_VERSION} for ${BINARY_ARCH} from ${DOWNLOAD_URL}..." && \
+  DOWNLOAD_URL="https://github.com/Cleanuparr/Cleanuparr/releases/download/v${APP_VERSION}/Cleanuparr-${APP_VERSION}-linux-${BINARY_ARCH}.zip" && \
+  echo "→ Downloading Cleanuparr v${APP_VERSION} for ${BINARY_ARCH}..." && \
+  echo "  URL: ${DOWNLOAD_URL}" && \
   curl -fsSL "${DOWNLOAD_URL}" -o /tmp/cleanuparr.zip && \
-  # Extract the downloaded archive
+  echo "✓ Download complete" && \
+  echo "→ Extracting archive..." && \
   unzip -q /tmp/cleanuparr.zip -d /tmp/ && \
-  # Move the binary to /usr/bin
-  mv "/tmp/Cleanuparr-${CLEANUPARR_VERSION}-linux-${BINARY_ARCH}/Cleanuparr" /usr/bin/cleanuparr && \
-  # Make the binary executable
+  echo "✓ Archive extracted" && \
+  echo "→ Installing binary to /usr/bin/cleanuparr..." && \
+  mv "/tmp/Cleanuparr-${APP_VERSION}-linux-${BINARY_ARCH}/Cleanuparr" /usr/bin/cleanuparr && \
   chmod +x /usr/bin/cleanuparr && \
-  # Clean up temporary files
-  rm -rf /tmp/cleanuparr.zip "/tmp/Cleanuparr-${CLEANUPARR_VERSION}-linux-${BINARY_ARCH}" && \
-  # Verify the binary was installed
+  echo "✓ Binary installed and made executable" && \
+  echo "→ Cleaning up temporary files..." && \
+  rm -rf /tmp/cleanuparr.zip "/tmp/Cleanuparr-${APP_VERSION}-linux-${BINARY_ARCH}" && \
+  echo "✓ Cleanup complete" && \
+  echo "" && \
+  echo "→ Verifying installation..." && \
   echo "Cleanuparr binary installed successfully:" && \
-  /usr/bin/cleanuparr --version || echo "Warning: Unable to run Cleanuparr --version"
+  /usr/bin/cleanuparr --version || echo "  ⚠ Warning: Unable to run Cleanuparr --version" && \
+  echo ""
 
-# Copy root filesystem overlay
-# This includes S6-Overlay service scripts and initialization scripts
+# =============================================================================
+# Copy Root Filesystem Overlay
+# =============================================================================
 COPY rootfs /
 
-# Set permissions for service scripts
-# Ensure all scripts are executable
 RUN \
-  chmod a+x /etc/cont-init.d/*.sh 2>/dev/null || true && \
-  find /etc/services.d -type f -name "run" -exec chmod +x {} \; 2>/dev/null || true && \
-  find /etc/services.d -type f -name "finish" -exec chmod +x {} \; 2>/dev/null || true && \
-  chmod a+x /etc/s6-overlay/s6-rc.d/*/up 2>/dev/null || true && \
-  chmod a+x /etc/s6-overlay/s6-rc.d/*/run 2>/dev/null || true
+  echo "[3/4] Copying root filesystem overlay..." && \
+  echo "✓ Root filesystem copied" && \
+  echo "  Contents:" && \
+  find /etc/cont-init.d -type f 2>/dev/null | sed 's/^/    /' || echo "    (no cont-init.d scripts)" && \
+  find /etc/services.d -type f 2>/dev/null | sed 's/^/    /' || echo "    (no services.d scripts)" && \
+  echo ""
+
+# =============================================================================
+# Set Permissions for Service Scripts
+# =============================================================================
+RUN \
+  echo "→ Setting executable permissions on service scripts..." && \
+  echo "  Processing /etc/cont-init.d/..." && \
+  chmod a+x /etc/cont-init.d/*.sh 2>/dev/null || echo "    (no scripts found)" && \
+  echo "  Processing /etc/services.d/ run scripts..." && \
+  find /etc/services.d -type f -name "run" -exec chmod +x {} \; 2>/dev/null || echo "    (no run scripts found)" && \
+  echo "  Processing /etc/services.d/ finish scripts..." && \
+  find /etc/services.d -type f -name "finish" -exec chmod +x {} \; 2>/dev/null || echo "    (no finish scripts found)" && \
+  echo "  Processing /etc/s6-overlay/s6-rc.d/ up scripts..." && \
+  chmod a+x /etc/s6-overlay/s6-rc.d/*/up 2>/dev/null || echo "    (no up scripts found)" && \
+  echo "  Processing /etc/s6-overlay/s6-rc.d/ run scripts..." && \
+  chmod a+x /etc/s6-overlay/s6-rc.d/*/run 2>/dev/null || echo "    (no run scripts found)" && \
+  echo "✓ Permissions set" && \
+  echo ""
+
+# =============================================================================
+# Set Working Directory and Environment
+# =============================================================================
+RUN \
+  echo "[4/4] Configuring environment..." && \
+  echo "✓ Working directory: /config" && \
+  echo "✓ Environment variables configured:" && \
+  echo "    CLEANUPARR_CONFIG_DIR=/config/cleanuparr" && \
+  echo "    CLEANUPARR_LOG_LEVEL=info" && \
+  echo "    PORT=11011" && \
+  echo ""
 
 # Set the working directory
-# The application will run from here
 WORKDIR /config
 
 # Default environment variables
-# These can be overridden at runtime
 ENV \
   CLEANUPARR_CONFIG_DIR="/config/cleanuparr" \
   CLEANUPARR_LOG_LEVEL="info" \
   PORT="11011"
 
+# =============================================================================
+# Health Check Configuration
+# =============================================================================
+RUN \
+  echo "→ Configuring health check..." && \
+  echo "✓ Health check configured (http://localhost:11011/health)" && \
+  echo "" && \
+  echo "════════════════════════════════════════════════════════════════" && \
+  echo "  ✓ Build Complete!" && \
+  echo "════════════════════════════════════════════════════════════════" && \
+  echo "" && \
+  echo "  Cleanuparr Add-on Ready!" && \
+  echo "  Version: ${BUILD_VERSION}" && \
+  echo "  Architecture: ${BUILD_ARCH}" && \
+  echo "" && \
+  echo "  Next Steps:" && \
+  echo "  1. Configure your *arr applications" && \
+  echo "  2. Configure your download clients" && \
+  echo "  3. Set up cleaning rules" && \
+  echo "  4. Start cleaning!" && \
+  echo "" && \
+  echo "════════════════════════════════════════════════════════════════"
+
 # Health check
-# Verify the service is responding
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD curl -f http://localhost:11011/health || exit 1
 

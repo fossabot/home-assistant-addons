@@ -5,13 +5,24 @@
   "labels": ["dependencies"],
   "commitMessagePrefix": "⏫",
   "commitMessageTopic": "{{depName}}",
-  "regexManagers": [
+  "customManagers": [
     {
-      "fileMatch": ["/Dockerfile$", "/build.yaml$"],
+      "customType": "regex",
+      "description": "Extract base images from Home Assistant addon build.yaml files",
+      "managerFilePatterns": ["**/build.yaml"],
       "matchStringsStrategy": "any",
       "matchStrings": [
-        "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\s+",
-        "(aarch64|amd64|armhf|armv7|i386):\\s[\"']?(?<depName>.*?):(?<currentValue>.*?)[\"']?\\s"
+        "(aarch64|amd64|armhf|armv7|i386):\\s[\\\"']?(?<depName>.*?):(?<currentValue>.*?)[\\\"']?\\s"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "description": "Extract base images from Dockerfile BUILD_FROM ARG",
+      "managerFilePatterns": ["**/Dockerfile"],
+      "matchStringsStrategy": "any",
+      "matchStrings": [
+        "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\\\s+"
       ],
       "datasourceTemplate": "docker"
     }
@@ -28,29 +39,16 @@
       "automerge": true
     },
     {
-      "groupName": "HomeAssistant Add-on base image",
+      "description": "Group Home Assistant base image updates together",
+      "groupName": "Home Assistant base images",
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^(?:ghcr.io/)?home-assistant/.*-base$"]
+      "matchPackagePatterns": ["^(?:ghcr\\.io/)?home-assistant/(?:aarch64|amd64|armv7|armhf|i386)-base$"]
     },
     {
-      "groupName": "HomeAssistant hassio-addons debian base image",
+      "description": "Group hassio-addons debian base image updates",
+      "groupName": "Home Assistant debian-base images",
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^(?:ghcr.io/)?hassio-addons/debian-base/.*$"]
-    },
-    {
-      "groupName": "VictoriaMetrics",
-      "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^victoriametrics/"]
-    },
-    {
-      "groupName": "linuxserver.io/syslog-ng",
-      "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^lscr.io/linuxserver/syslog-ng"]
-    },
-    {
-      "groupName": "linuxserver.io/healthchecks",
-      "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^lscr.io/linuxserver/healthchecks"]
+      "matchPackagePatterns": ["^(?:ghcr\\.io/)?hassio-addons/debian-base/.*$"]
     }
   ]
 }

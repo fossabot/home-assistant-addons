@@ -1,18 +1,11 @@
 ---
-# Build Configuration for Cleanuparr Add-on
-# This file configures the build process for the Home Assistant add-on
-
-# Base Images per Architecture
-# Using Home Assistant's minimal base images (Alpine Linux 3.20)
 build_from:
-  aarch64: "ghcr.io/home-assistant/aarch64-base:3.20"
-  amd64: "ghcr.io/home-assistant/amd64-base:3.20"
+  aarch64: "ghcr.io/home-assistant/aarch64-base:3.23"
+  amd64: "ghcr.io/home-assistant/amd64-base:3.23"
 
 # Build Arguments
 # These are passed to the Dockerfile during build
-args:
-  CLEANUPARR_VERSION: "2.5.1"
-  BUILD_DATE: "2024-01-27"
+app_version: "2.5.1"
 
 # Docker Labels
 # Metadata for the container image
@@ -23,7 +16,7 @@ labels:
   org.opencontainers.image.licenses: "Apache License 2.0"
   org.opencontainers.image.authors: "Your Name <you@example.com>"
   org.opencontainers.image.created: "${BUILD_DATE}"
-  org.opencontainers.image.version: "${CLEANUPARR_VERSION}"
+  org.opencontainers.image.version: "${BUILD_VERSION}"
 
 # Codenotary Configuration
 # Optional: Sign your images for verification (+1 security point)
