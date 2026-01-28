@@ -19,20 +19,31 @@ COPY --from=app-source /app/libe_sqlite3.so /usr/lib/libe_sqlite3.so
 # Copy web UI assets (wwwroot directory)
 COPY --from=app-source /app/wwwroot /app/wwwroot
 
-# Install runtime dependencies
-RUN apk add --no-cache \
+# Install runtime dependencies (Debian)
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
-    gomplate \
     bash \
-    icu-libs \
-    libstdc++ \
-    tzdata
+    tzdata \
+    curl \
+    python3 \
+    python3-venv \
+    && rm -rf /var/lib/apt/lists/*
 
-# Create application user and directory
-RUN addgroup -g 1000 appgroup && \
-    adduser -u 1000 -G appgroup -D -h /config -s /sbin/nologin appuser && \
-    mkdir -p /config && \
-    chown -R appuser:appgroup /config
+# Create Python virtual environment and install Apprise
+ENV VIRTUAL_ENV=/opt/apprise-venv
+RUN python3 -m venv $VIRTUAL_ENV
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+RUN pip install --no-cache-dir apprise==1.9.6
+
+# Install gomplate for configuration templating (architecture-aware)
+ARG BUILD_ARCH
+RUN GOMPLATE_ARCH=$([ "${BUILD_ARCH}" = "amd64" ] && echo "amd64" || echo "arm64") && \
+    curl -o /usr/local/bin/gomplate -sSL "https://github.com/hairyhenderson/gomplate/releases/download/v3.11.5/gomplate_linux-${GOMPLATE_ARCH}" && \
+    chmod +x /usr/local/bin/gomplate
+
+# Create application directories
+RUN mkdir -p /config /data && \
+    chmod 755 /config /data
 
 # Copy S6-overlay configuration (v2 legacy format)
 COPY rootfs /
