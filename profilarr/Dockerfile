@@ -1,6 +1,6 @@
 ARG BUILD_FROM
 ARG BUILD_VERSION
-FROM santiagosayshey/profilarr:${BUILD_VERSION} AS profilarr-base
+FROM santiagosayshey/profilarr:v1.1.3 AS profilarr-base
 FROM ${BUILD_FROM} AS final
 
 # Install runtime dependencies
