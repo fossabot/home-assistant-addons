@@ -402,6 +402,58 @@ image: "ghcr.io/username/{arch}-addon-loki"
 - Replace `grafana/loki` with your actual upstream image name
 - This enables automated PRs when new versions are released
 
+### Upstream Version Management with Renovate
+
+**Automatic Version Tracking**:
+- Add a `# docker:image/name` comment next to the version in config.yaml
+- Renovate bot automatically tracks upstream Docker image versions
+- Pull requests are created when new versions are detected
+- Only the version value is updated, preserving your configuration
+
+**Format**:
+```yaml
+version: "2.5.1" # docker:ghcr.io/cleanuparr/cleanuparr
+```
+
+**Pattern Breakdown**:
+- `version:` - YAML key for the add-on version
+- `"2.5.1"` - Current upstream version (quoted string)
+- `# docker:` - Renovate marker prefix
+- `ghcr.io/cleanuparr/cleanuparr` - Upstream Docker image name
+
+**Supported Registries**:
+- Docker Hub: `# docker:library/nginx` or `# docker:nginx`
+- GitHub Container Registry: `# docker:ghcr.io/user/repo`
+- Quay.io: `# docker:quay.io/repo/image`
+- Any registry with tag API support
+
+**Examples**:
+```yaml
+# GHCR image
+version: "4.6"  # docker:rommapp/romm
+
+# Docker Hub library image
+version: "3.19"  # docker:alpine
+
+# Docker Hub user image
+version: "1.1.3"  # docker:santiagosayshey/profilarr
+
+# Custom registry
+version: "2.0.0"  # docker:ghcr.io/cleanuparr/cleanuparr
+```
+
+**How It Works**:
+1. Renovate scans `config.yaml` files for version comments
+2. Extracts the current version and image name
+3. Queries Docker registry for available tags
+4. Creates a PR when a new version is found
+5. PR updates only the version value, not the comment
+
+**Troubleshooting**:
+- **No PR created?** Check that the image name is correct and the registry is accessible
+- **Wrong version detected?** Ensure the comment format exactly matches `# docker:image-name`
+- **Want to exclude?** Remove the `# docker:` comment from the version line
+
 **Map upstream settings to options:**
 
 | Upstream Setting | Type | Add-on Option | Notes |

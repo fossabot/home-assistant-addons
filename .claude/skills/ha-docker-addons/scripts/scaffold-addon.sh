@@ -38,7 +38,7 @@ echo "✓ Created S6-overlay structure"
 # Create placeholder files
 cat > "${ADDON_NAME}"/config.yaml << EOF
 name: "${ADDON_NAME^}"
-version: "1.0.0"  # docker:UPSTREAM_IMAGE_HERE  # Update with actual upstream image
+version: "1.0.0"  # docker:${UPSTREAM_IMAGE}  # Automatically updated by Renovate
 slug: "${ADDON_NAME}"
 description: "Home Assistant add-on for ${UPSTREAM_IMAGE}"
 

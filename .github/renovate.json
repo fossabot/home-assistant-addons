@@ -2,41 +2,44 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "rebaseWhen": "behind-base-branch",
   "dependencyDashboard": true,
-  "labels": ["dependencies"],
-  "commitMessagePrefix": "⏫",
+  "labels": ["dependencies", "no-stale"],
+  "commitMessagePrefix": "⬆️",
   "commitMessageTopic": "{{depName}}",
-
-  "includePaths": [
-    "romm/**",
-    "profilarr/**",
-    "cleanuparr/**"
-  ],
-
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Extract addon version and Docker image from config.yaml",
-      "managerFilePatterns": ["*/config.yaml"],
+      "description": "Extract upstream app versions from config.yaml",
+      "managerFilePatterns": ["**/config.yaml"],
       "matchStrings": [
-        "version:\\s+\\\"?v?(?<currentValue>[^\\\"\\s]+)\\\"?\\s*#\\s*(?<datasource>docker|github):(?<depName>[^\\s]+)"
+        "^version:\\s*[\"']?(?<currentValue>[\\d.]+)[\"']?\\s*#\\s*docker:(?<depName>[^\\s]+)"
       ],
-      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}docker{{/if}}",
-      "versioningTemplate": "docker"
+      "datasourceTemplate": "docker",
+      "versioningTemplate": "semver",
+      "autoReplaceStringTemplate": "version: \"{{{newValue}}}\" # docker:{{{depName}}}"
     }
   ],
-
   "packageRules": [
     {
-      "description": "Label major addon updates for review",
-      "matchUpdateTypes": ["major"],
-      "matchFileNames": ["*/config.yaml"],
-      "labels": ["UPDATE-MAJOR"]
+      "description": "Group base image updates",
+      "groupName": "Add-on base image",
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["**/Dockerfile", "**/build.yaml"]
     },
     {
-      "description": "Group Home Assistant base image updates",
-      "groupName": "Home Assistant base images",
+      "description": "Automerge patch updates for base images",
+      "groupName": "Add-on base image",
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^(?:ghcr\\.io/)?home-assistant/(?:aarch64|amd64|armv7|armhf|i386)-base$"]
+      "matchFileNames": ["**/Dockerfile", "**/build.yaml"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": false
+    },
+    {
+      "description": "Group upstream app version updates",
+      "groupName": "Upstream app version",
+      "matchDatasources": ["docker"],
+      "matchFileNames": ["**/config.yaml"],
+      "automerge": false,
+      "addLabels": ["upstream-version"]
     }
   ]
 }
