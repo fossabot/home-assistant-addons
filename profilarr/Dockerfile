@@ -1,5 +1,5 @@
 ARG BUILD_FROM
-ARG APP_VERSION
+ARG APP_VERSION=0.0
 FROM santiagosayshey/profilarr:${APP_VERSION} AS profilarr-base
 FROM ${BUILD_FROM} AS final
 
