@@ -250,6 +250,13 @@ image: "ghcr.io/username/{arch}-addon-loki"
 - Access main port in scripts via `bashio::addon.port 3100`
 - Additional ports can go in options if needed
 
+**Important: Version Comment for Renovate**
+- Add a `# docker:image/name` comment next to the version for automatic dependency updates
+- Format: `version: "3.6.4"  # docker:grafana/loki`
+- The Renovate bot parses this comment to track upstream Docker image updates
+- Replace `grafana/loki` with your actual upstream image name
+- This enables automated PRs when new versions are released
+
 **Map upstream settings to options:**
 
 | Upstream Setting | Type | Add-on Option | Notes |

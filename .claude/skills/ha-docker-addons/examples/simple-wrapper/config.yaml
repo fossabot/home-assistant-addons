@@ -1,5 +1,5 @@
 name: "Simple Wrapper Example"
-version: "3.19"
+version: "3.19"  # docker:alpine
 slug: "simple-wrapper"
 description: "Example of wrapping a Docker image as HA add-on"
 url: "https://github.com/example/ha-addons"

@@ -12,13 +12,6 @@
     "cleanuparr/**"
   ],
 
-  "excludePaths": [
-    "docs/**",
-    "scripts/**",
-    ".github/**",
-    ".claude/**"
-  ],
-
   "customManagers": [
     {
       "customType": "regex",
@@ -50,7 +43,7 @@
     {
       "description": "Use semver versioning for GitHub releases",
       "matchDatasources": ["github-releases"],
-      "versioningTemplate": "semver"
+      "versioning": "semver"
     },
     {
       "description": "Group Home Assistant base image updates",
