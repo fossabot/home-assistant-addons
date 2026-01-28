@@ -1,6 +1,6 @@
 ---
 name: "Cleanuparr"
-version: "2.5.1"
+version: "2.5.1"  # github:Cleanuparr/Cleanuparr
 slug: "cleanuparr"
 description: >-
   Automated cleanup for Sonarr, Radarr, Lidarr, Readarr, and Whisparr downloads. Remove stalled, slow, failed imports, and malware torrents. Automatic search replacement and seeding management.

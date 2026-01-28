@@ -5,50 +5,58 @@
   "labels": ["dependencies"],
   "commitMessagePrefix": "⏫",
   "commitMessageTopic": "{{depName}}",
+
+  "includePaths": [
+    "romm/**",
+    "profilarr/**",
+    "cleanuparr/**"
+  ],
+
+  "excludePaths": [
+    "docs/**",
+    "scripts/**",
+    ".github/**",
+    ".claude/**"
+  ],
+
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Extract base images from Home Assistant addon build.yaml files",
-      "managerFilePatterns": ["**/build.yaml"],
-      "matchStringsStrategy": "any",
+      "description": "Extract addon version and Docker image from config.yaml using combination strategy",
+      "managerFilePatterns": ["*/config.yaml"],
+      "matchStringsStrategy": "combination",
       "matchStrings": [
-        "(aarch64|amd64|armhf|armv7|i386):\\s[\\\"']?(?<depName>.*?):(?<currentValue>.*?)[\\\"']?\\s"
+        "version:\\s+\\\"?(?<currentValue>[\\d.]+)\\\"?\\s*#\\s*(?<datasource>docker|github):(?<depName>[^\\s]+)"
       ],
-      "datasourceTemplate": "docker"
-    },
-    {
-      "customType": "regex",
-      "description": "Extract base images from Dockerfile BUILD_FROM ARG",
-      "managerFilePatterns": ["**/Dockerfile"],
-      "matchStringsStrategy": "any",
-      "matchStrings": [
-        "ARG BUILD_FROM=(?<depName>.*?):(?<currentValue>.*?)\\\\s+"
-      ],
-      "datasourceTemplate": "docker"
+      "datasourceTemplate": "{{#if datasource}}{{{datasource}}}{{else}}docker{{/if}}",
+      "versioningTemplate": "docker"
     }
   ],
+
   "packageRules": [
     {
-      "dependencyDashboardApproval": true,
-      "matchUpdateTypes": ["major"],
-      "labels": ["UPDATE-MAJOR"]
-    },
-    {
+      "description": "Automerge minor and patch updates for addon applications",
       "matchUpdateTypes": ["minor", "patch"],
-      "matchCurrentVersion": "!/^0/",
+      "matchFileNames": ["*/config.yaml"],
       "automerge": true
     },
     {
-      "description": "Group Home Assistant base image updates together",
+      "description": "Require approval for major addon updates",
+      "dependencyDashboardApproval": true,
+      "matchUpdateTypes": ["major"],
+      "matchFileNames": ["*/config.yaml"],
+      "labels": ["UPDATE-MAJOR"]
+    },
+    {
+      "description": "Use semver versioning for GitHub releases",
+      "matchDatasources": ["github-releases"],
+      "versioningTemplate": "semver"
+    },
+    {
+      "description": "Group Home Assistant base image updates",
       "groupName": "Home Assistant base images",
       "matchDatasources": ["docker"],
       "matchPackagePatterns": ["^(?:ghcr\\.io/)?home-assistant/(?:aarch64|amd64|armv7|armhf|i386)-base$"]
-    },
-    {
-      "description": "Group hassio-addons debian base image updates",
-      "groupName": "Home Assistant debian-base images",
-      "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^(?:ghcr\\.io/)?hassio-addons/debian-base/.*$"]
     }
   ]
 }

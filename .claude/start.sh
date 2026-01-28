@@ -644,6 +644,64 @@ check_plugin_updates() {
 }
 
 #######################################
+# Update claudeup and kairo
+# Arguments:
+#   Log level
+#######################################
+update_claudeup_and_kairo() {
+  local log_level="$1"
+
+  log "${LOG_LEVEL_DEBUG}" "${log_level}" "Updating claudeup and kairo..."
+
+  # Update claudeup if installed
+  if command -v claudeup &>/dev/null; then
+    log "${LOG_LEVEL_DEBUG}" "${log_level}" "Running claudeup update..."
+    local claudeup_output
+    local claudeup_exit
+    local claudeup_exit_file="${TEMP_DIR}/claudeup_update_exit"
+
+    claudeup_output="$(gum spin --spinner "${GUM_SPINNER}" --show-error --title "Updating claudeup..." -- bash -c "claudeup update 2>&1; echo \$? > '${claudeup_exit_file}'")"
+    claudeup_exit="$(cat "${claudeup_exit_file}" 2>/dev/null || echo 0)"
+
+    log "${LOG_LEVEL_DEBUG}" "${log_level}" "claudeup update exit code: ${claudeup_exit}"
+    log "${LOG_LEVEL_DEBUG}" "${log_level}" "claudeup update output: ${claudeup_output}"
+
+    if (( claudeup_exit == 0 )); then
+      gum style --foreground 212 "✓ claudeup updated successfully"
+    else
+      gum style --foreground "214" "⚠ claudeup update had issues"
+    fi
+  else
+    gum style --foreground 240 "⊘ claudeup not installed, skipping"
+  fi
+
+  # Update kairo if installed
+  if command -v kairo &>/dev/null; then
+    log "${LOG_LEVEL_DEBUG}" "${log_level}" "Running kairo update..."
+    local kairo_output
+    local kairo_exit
+    local kairo_exit_file="${TEMP_DIR}/kairo_update_exit"
+
+    # Pipe 'yes' to handle interactive prompts automatically
+    kairo_output="$(yes | gum spin --spinner "${GUM_SPINNER}" --show-error --title "Updating kairo..." -- bash -c "kairo update 2>&1; echo \$? > '${kairo_exit_file}'")"
+    kairo_exit="$(cat "${kairo_exit_file}" 2>/dev/null || echo 0)"
+
+    log "${LOG_LEVEL_DEBUG}" "${log_level}" "kairo update exit code: ${kairo_exit}"
+    log "${LOG_LEVEL_DEBUG}" "${log_level}" "kairo update output: ${kairo_output}"
+
+    if (( kairo_exit == 0 )); then
+      gum style --foreground 212 "✓ kairo updated successfully"
+    else
+      gum style --foreground "214" "⚠ kairo update had issues"
+    fi
+  else
+    gum style --foreground 240 "⊘ kairo not installed, skipping"
+  fi
+
+  return 0
+}
+
+#######################################
 # Main function
 # Arguments:
 #   All script arguments
@@ -696,13 +754,25 @@ main() {
 
   # Select AI assistant
   local assistant
-  assistant="$(gum choose --header "Choose AI Assistant" "🤖 zAI" "🧠 Claude" "🔄 Check for plugin updates")" || exit 0
+  assistant="$(gum choose --header "Choose AI Assistant" "🤖 zAI" "🧠 Claude" "🔄 Check for plugin updates" "🔧 Update claudeup and kairo")" || exit 0
   log "${LOG_LEVEL_DEBUG}" "${log_level}" "Selected assistant: ${assistant}"
 
   # Handle plugin updates check
   if [[ "${assistant}" == "🔄 Check for plugin updates" ]]; then
     check_plugin_updates "${log_level}"
     # After plugin updates, return to assistant selection
+    if gum confirm "Launch an assistant?"; then
+      assistant="$(gum choose --header "Choose AI Assistant" "🤖 zAI" "🧠 Claude")" || exit 0
+      log "${LOG_LEVEL_DEBUG}" "${log_level}" "Selected assistant: ${assistant}"
+    else
+      return 0
+    fi
+  fi
+
+  # Handle claudeup and kairo update
+  if [[ "${assistant}" == "🔧 Update claudeup and kairo" ]]; then
+    update_claudeup_and_kairo "${log_level}"
+    # After update, return to assistant selection
     if gum confirm "Launch an assistant?"; then
       assistant="$(gum choose --header "Choose AI Assistant" "🤖 zAI" "🧠 Claude")" || exit 0
       log "${LOG_LEVEL_DEBUG}" "${log_level}" "Selected assistant: ${assistant}"
