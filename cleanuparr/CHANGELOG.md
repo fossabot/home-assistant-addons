@@ -1,5 +1,11 @@
 # Changelog
 
+## cleanuparr 0.2.5 - 2026-01-28
+
+### Changes
+
+- No changes
+
 ## cleanuparr 0.2.4 - 2026-01-28
 
 ### Changes
