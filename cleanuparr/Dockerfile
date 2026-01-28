@@ -34,12 +34,12 @@ RUN addgroup -g 1000 appgroup && \
     mkdir -p /config && \
     chown -R appuser:appgroup /config
 
-# Copy S6-overlay configuration
+# Copy S6-overlay configuration (v2 legacy format)
 COPY rootfs /
 
-# Set permissions for S6 scripts and ensure proper ownership
-RUN chmod +x /etc/s6-overlay/s6-rc.d/cleanuparr/run && \
-    chmod +x /etc/s6-overlay/s6-rc.d/cleanuparr/finish
+# Set permissions for S6 v2 service scripts
+RUN chmod +x /etc/services.d/cleanuparr/run && \
+    chmod +x /etc/services.d/cleanuparr/finish
 
 WORKDIR /
 

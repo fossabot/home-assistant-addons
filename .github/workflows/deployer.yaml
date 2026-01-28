@@ -53,8 +53,8 @@ jobs:
         run: |
           date="$(date +"%Y-%m-%dT%H:%M:%SZ")"
 
-          # Read version from config.yaml (upstream app version)
-          version=$(yq '.version' "${{ inputs.addon }}/config.yaml")
+          version="${{ steps.release_notes.outputs.tag_name }}"
+          version="${version##*-}"
 
           echo "Add-on: ${{ inputs.addon }} Version: ${version} Date: $date"
           echo "release_date=$date" >> $GITHUB_OUTPUT
