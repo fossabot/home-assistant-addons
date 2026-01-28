@@ -8,8 +8,9 @@ FROM ghcr.io/cleanuparr/cleanuparr:${BUILD_VERSION} AS app-source
 # Stage 2: Build on Home Assistant base
 FROM ${BUILD_FROM}
 
-# Copy Cleanuparr binary
+# Copy Cleanuparr binary with executable permissions
 COPY --from=app-source /app/Cleanuparr /usr/bin/cleanuparr
+RUN chmod +x /usr/bin/cleanuparr
 
 # Copy dependency libraries (.NET self-contained app)
 COPY --from=app-source /app/libMono.Unix.so /usr/lib/libMono.Unix.so
@@ -36,9 +37,9 @@ RUN addgroup -g 1000 appgroup && \
 # Copy S6-overlay configuration
 COPY rootfs /
 
-# Set permissions for S6 scripts
-RUN chmod a+x /etc/s6-overlay/s6-rc.d/cleanuparr/run && \
-    chmod a+x /etc/s6-overlay/s6-rc.d/cleanuparr/finish
+# Set permissions for S6 scripts and ensure proper ownership
+RUN chmod +x /etc/s6-overlay/s6-rc.d/cleanuparr/run && \
+    chmod +x /etc/s6-overlay/s6-rc.d/cleanuparr/finish
 
 WORKDIR /app
 

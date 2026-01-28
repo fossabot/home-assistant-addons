@@ -83,11 +83,6 @@ Set up the standard Home Assistant add-on structure with proper organization for
 
 **Create the base structure:**
 
-```bash
-mkdir -p my-addon/{rootfs/etc/s6-overlay/s6-rc.d,rootfs/defaults,translations}
-cd my-addon
-```
-
 Use `scripts/scaffold-addon.sh [addon-name] [upstream-image]` to generate the complete structure automatically.
 
 **Required files:**
