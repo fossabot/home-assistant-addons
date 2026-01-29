@@ -1,6 +1,7 @@
 ARG BUILD_FROM
 ARG BUILD_VERSION
-FROM santiagosayshey/profilarr:v1.1.3 AS profilarr-base
+ARG BASE_IMAGE=santiagosayshey/profilarr:v1.1.3
+FROM ${BASE_IMAGE} AS profilarr-base
 FROM ${BUILD_FROM} AS final
 
 # Install runtime dependencies (Debian)

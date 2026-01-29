@@ -17,7 +17,32 @@ runs:
         data=()
         readme=()
         for directory in $(find ./ -maxdepth 2 -name config.json -o -name config.yaml -o -name config.yml | cut -d "/" -f2 | sort -u); do
-          addon=$(yq e -N -M '. | {"name": .name, "slug": .slug, "version": .version, "description": .description, "arch": .arch }' -o=json -I=0 "${directory}/config.yaml")
+          # Extract base image from Dockerfile (handle various patterns)
+          base_image=""
+          dockerfile="${directory}/Dockerfile"
+          if [[ -f "$dockerfile" ]]; then
+            # Look for BASE_IMAGE ARG or extract from first FROM statement with AS
+            base_image=$(grep -E '^ARG BASE_IMAGE=' "$dockerfile" | sed 's/^ARG BASE_IMAGE=//' | tr -d '"')
+            if [[ -z "$base_image" ]]; then
+              # Extract from first FROM statement (e.g., "FROM image:tag AS name" or "FROM image:tag")
+              base_image=$(grep -m1 '^FROM ' "$dockerfile" | sed -E 's/^FROM[[:space:]]+([^[:space:]]+).*/\1/')
+            fi
+          fi
+
+          # Parse upstream version from base image (e.g., "v1.1.3" from "repo/image:v1.1.3")
+          upstream_version=""
+          if [[ -n "$base_image" ]]; then
+            upstream_version=$(echo "$base_image" | grep -oE ':[^[:space:]]+' | tr -d ':')
+          fi
+
+          # Extract project_url from addon_info.json if it exists
+          project_url=""
+          info_file="${directory}/addon_info.json"
+          if [[ -f "$info_file" ]]; then
+            project_url=$(jq -r '.project_url // empty' "$info_file" 2>/dev/null || echo "")
+          fi
+
+          addon=$(yq e -N -M '. | {"name": .name, "slug": .slug, "version": .version, "description": .description, "arch": .arch, "base_image": env(base_image), "upstream_version": env(upstream_version), "project_url": env(project_url) }' -o=json -I=0 "${directory}/config.yaml")
           data+=("${addon}");
           readme+=("${directory}");
         done

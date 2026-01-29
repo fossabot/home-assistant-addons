@@ -4,13 +4,13 @@
 {{- $slug := "profilarr" -}}
 {{- $addon := where $addons "slug" $slug | first 0 | index 0 -}}
 
-# {{ $addon.name }}
+# {{ $addon.name }}{{ if $addon.upstream_version }} **{{ $addon.upstream_version }}**{{ end }}
 
 {{ $addon.description }}
 
 ## About
 
-Home Assistant add-on for [{{ $addon.name }}]({{ $addon.url }}).
+Home Assistant add-on for [{{ $addon.name }}]({{ $addon.project_url }}).
 
 ## Installation
 
@@ -36,11 +36,12 @@ The add-on can be configured via the Home Assistant UI. See the upstream project
 ## Version
 
 **Current version:** {{ $addon.version }}
+{{ if $addon.base_image }}**Base image:** `{{ $addon.base_image }}`{{ end }}
 
 ## Support
 
 - **Issues**: Report issues on [GitHub]({{ $repo_url }})
-- **Upstream**: [{{ $addon.name }}]({{ $addon.url }})
+- **Upstream**: [{{ $addon.name }}]({{ $addon.project_url }})
 
 ## License
 
