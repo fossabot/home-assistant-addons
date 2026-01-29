@@ -9,7 +9,7 @@ mkdir -p /data/logs
 mkdir -p /data/db
 
 # Get addon config path
-ADDON_CONFIG="$(bashio::addon.config_path)"
+ADDON_CONFIG="$(bashio::addon::config_path)"
 
 # Create symlink for config directory
 if [ ! -L /config ]; then
