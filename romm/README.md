@@ -33,11 +33,16 @@ The add-on can be configured via the Home Assistant UI. See the upstream project
 
 ## Version
 
+![Latest Upstream](https://img.shields.io/docker/v/rommapp/romm?label=latest%20upstream)
+
 **Current version:** 1.0
 **Base image:** `rommapp/romm:4.6.0`
+**Upstream version:** 4.6.0
 
 ## Support
 
+- **Documentation**: [DOCS.md](https://github.com/rigerc/home-assistant-addons/blob/main/romm/DOCS.md)
+- **Changelog**: [CHANGELOG.md](https://github.com/rigerc/home-assistant-addons/blob/main/romm/CHANGELOG.md)
 - **Issues**: Report issues on [GitHub](https://github.com/rigerc/home-assistant-addons)
 - **Upstream**: [Romm](https://github.com/rommapp/romm)
 
