@@ -42,14 +42,10 @@ jobs:
 
   deploy:
     needs: setup
-    runs-on: ubuntu-latest
-    name: 🚀 Deploy ${{ matrix.addon }}
     strategy:
       fail-fast: false
       matrix:
         addon: ${{ fromJson(needs.setup.outputs.selected) }}
-    steps:
-      - name: 🚀 Trigger Deployer for ${{ matrix.addon }}
-        uses: ./.github/workflows/deployer.yaml
-        with:
-          addon: ${{ matrix.addon }}
+    uses: ./.github/workflows/deployer.yaml
+    with:
+      addon: ${{ matrix.addon }}
