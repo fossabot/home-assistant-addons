@@ -65,7 +65,7 @@ ENV DOTNET_USE_POLLING_FILE_WATCHER=true \
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
-  CMD curl -f http://localhost:${HTTP_PORTS}/health || exit 1
+  CMD curl -f http://localhost:11011/health || exit 1
 
 # Labels
 LABEL \

@@ -6,7 +6,9 @@
 {{- if eq .slug $slug -}}
 {{- $addon := . -}}
 
-# {{ $addon.name }}{{ if $addon.upstream_version }} **{{ $addon.upstream_version }}**{{ end }}
+# {{ $addon.name }}
+
+{{ if $addon.upstream_image_repo }}{{ if eq $addon.upstream_badge_type "docker" }}![Latest Upstream](https://img.shields.io/docker/v/{{ $addon.upstream_image_repo }}?label=latest){{ else if eq $addon.upstream_badge_type "github" }}![Latest Upstream](https://img.shields.io/github/release/{{ $addon.upstream_image_repo }}?label=latest){{ end }}{{ end }} ![Add-on Version](https://img.shields.io/badge/version-{{ $addon.version | strings.ReplaceAll "-" "--" }}-blue){{ if $addon.upstream_version }} ![Upstream Version](https://img.shields.io/badge/upstream-{{ $addon.upstream_version | strings.ReplaceAll "-" "--" }}-informational){{ end }}
 
 {{ $addon.description }}
 
@@ -34,14 +36,6 @@ Our add-on supports the following architectures with manifests.
 ## Configuration
 
 The add-on can be configured via the Home Assistant UI. See the upstream project for configuration details.
-
-## Version
-
-{{ if $addon.upstream_image_repo }}{{ if eq $addon.upstream_badge_type "docker" }}![Latest Upstream](https://img.shields.io/docker/v/{{ $addon.upstream_image_repo }}?label=latest%20upstream){{ else if eq $addon.upstream_badge_type "github" }}![Latest Upstream](https://img.shields.io/github/release/{{ $addon.upstream_image_repo }}?label=latest%20upstream){{ end }}{{ end }}
-
-**Current version:** {{ $addon.version }}
-{{ if $addon.base_image }}**Base image:** `{{ $addon.base_image }}`{{ end }}
-{{ if $addon.upstream_version }}**Upstream version:** {{ $addon.upstream_version }}{{ end }}
 
 ## Support
 
