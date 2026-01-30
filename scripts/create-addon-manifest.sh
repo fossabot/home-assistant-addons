@@ -17,6 +17,10 @@ while read -r CONFIG; do
     # Extract values from YAML (top-level only)
     SLUG=$(yq -r '.slug' "$CONFIG")
     VERSION=$(yq -r '.version' "$CONFIG")
+    NAME=$(yq -r '.name' "$CONFIG")
+
+    # Extract architectures as JSON array
+    ARCHITECTURES=$(yq -r '.arch | @json' "$CONFIG")
 
     [[ -n "$SLUG" && -n "$VERSION" ]] || continue
 
@@ -33,11 +37,15 @@ while read -r CONFIG; do
     MANIFEST=$(jq \
       --arg slug "$SLUG" \
       --arg version "$VERSION" \
+      --arg name "$NAME" \
+      --argjson architectures "$ARCHITECTURES" \
       --arg image "$IMAGE" \
       --arg tag "$TAG" \
       '. + [{
         slug: $slug,
         version: $version,
+        name: $name,
+        architectures: $architectures,
         image: $image,
         tag: $tag
       }]' <<< "$MANIFEST")
