@@ -18,9 +18,6 @@ url: "https://github.com/user/repo"  # Documentation URL
 arch:
   - amd64      # 64-bit x86 (most common)
   - aarch64    # 64-bit ARM (Raspberry Pi 4)
-  - armv7      # 32-bit ARM (Raspberry Pi 3)
-  - armhf      # 32-bit ARM hard-float
-  - i386       # 32-bit x86
 ```
 
 ## Image Configuration

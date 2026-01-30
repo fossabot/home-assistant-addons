@@ -8,19 +8,6 @@ mkdir -p /data/config
 mkdir -p /data/logs
 mkdir -p /data/db
 
-# Get addon config path using addon slug
-# addon_config is mounted at /addon_configs/<slug>
-ADDON_SLUG="$(bashio::addon 'slug')"
-ADDON_CONFIG="/addon_configs/${ADDON_SLUG}"
-
-# Create symlink for config directory if not exists
-if [ ! -L /config ] && [ ! -d /config ]; then
-    ln -sf "$ADDON_CONFIG" /config
-fi
-
-# Ensure config directory exists
-mkdir -p "$ADDON_CONFIG"
-
 # Helper function to export environment variables for s6 services
 export_env() {
     local name="$1"

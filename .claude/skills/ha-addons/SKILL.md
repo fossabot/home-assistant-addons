@@ -6,7 +6,7 @@ version: 1.0.0
 
 # Home Assistant Add-on Development
 
-Create Home Assistant add-ons using a structured 7-phase workflow with discovery tools, scaffold templates, and best practices for this repository.
+Create Home Assistant add-ons using a structured 7-phase workflow with discovery tools, scaffold templates, and best practices for this repository. Do not explore the current codebase unless asked to do so.
 
 ## Purpose
 
@@ -335,7 +335,7 @@ docker run --rm -it \
 
 ## Phase 7: Deployment
 
-For this repository, add-ons are deployed via GitHub Actions when pushed to main.
+For this repository, add-ons are deployed via GitHub Actions when pushed to main. Copy .claude/skills/ha-addons/references/release-drafter-template.yml to .github/ and rename it release-drafter-{slug}.yml and edit the file to use the add-on slug.
 
 ## Additional Resources
 

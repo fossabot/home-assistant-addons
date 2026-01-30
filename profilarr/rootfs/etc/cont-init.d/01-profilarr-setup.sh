@@ -8,25 +8,6 @@ mkdir -p /data/config
 mkdir -p /data/logs
 mkdir -p /data/db
 
-# Get addon config path
-ADDON_CONFIG="$(bashio::addon::config_path)"
-
-# Create symlink for config directory
-if [ ! -L /config ]; then
-    ln -sf "$ADDON_CONFIG" /config
-fi
-
-# Ensure config directory exists
-mkdir -p "$ADDON_CONFIG"
-
-# Helper function to export environment variables for s6 services
-export_env() {
-    local name="$1"
-    local value="$2"
-    export "$name=$value"
-    printf "%s" "$value" > "/var/run/s6/container_environment/$name"
-}
-
 # Export log level using export_env function
 LOG_LEVEL="$(bashio::config 'log_level')"
 export_env LOG_LEVEL "$LOG_LEVEL"
