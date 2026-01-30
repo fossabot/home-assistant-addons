@@ -110,9 +110,9 @@ SOFTWARE.
 [cleanuparr-amd64-shield]: https://img.shields.io/badge/amd64-yes-green.svg
 [cleanuparr-armhf-shield]: https://img.shields.io/badge/armhf-no-red.svg
 [cleanuparr-armv7-shield]: https://img.shields.io/badge/armv7-no-red.svg
-[addon-profilarr]: https://github.com/rigerc/home-assistant-addons/tree/profilarr-0.1.11
-[addon-doc-profilarr]: https://github.com/rigerc/home-assistant-addons/blob/profilarr-0.1.11/README.md
-[profilarr-version-shield]: https://img.shields.io/badge/version-0.1.11-blue.svg
+[addon-profilarr]: https://github.com/rigerc/home-assistant-addons/tree/profilarr-0.1.13
+[addon-doc-profilarr]: https://github.com/rigerc/home-assistant-addons/blob/profilarr-0.1.13/README.md
+[profilarr-version-shield]: https://img.shields.io/badge/version-0.1.13-blue.svg
 [profilarr-latest-upstream]: https://img.shields.io/docker/v/santiagosayshey/profilarr?label=latest
 [profilarr-upstream-shield]: https://img.shields.io/badge/upstream-v1.1.3-informational.svg
 [profilarr-aarch64-shield]: https://img.shields.io/badge/aarch64-yes-green.svg
