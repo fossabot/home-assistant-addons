@@ -3,16 +3,10 @@ name: Lint
 
 # yamllint disable-line rule:truthy
 on:
-  push:
-    branches:
-      - main
-      - 'dev-*'
-  pull_request:
-    types:
-      - opened
-      - reopened
-      - synchronize
-  workflow_dispatch:
+  workflow_run:
+    workflows: [Addon Metadata]
+    types: [completed]
+    branches: [main]
 
 jobs:
   find:

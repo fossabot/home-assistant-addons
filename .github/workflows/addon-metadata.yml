@@ -2,7 +2,7 @@ name: Addon Metadata
 
 on:
   push:
-    branches: [main]
+    branches: [main, dev-*]
     paths:
       - '**/config.yaml'
       - '**/config.yml'
@@ -17,6 +17,7 @@ jobs:
   # Job 1: Update manifest.json if config files changed
   update-manifest:
     runs-on: ubuntu-latest
+    name: 📦 Update Manifest
     outputs:
       manifest_updated: ${{ steps.check.outputs.changed }}
     steps:
@@ -65,6 +66,7 @@ jobs:
   # Job 2: Update deployer.yaml if slugs changed
   update-deployer:
     runs-on: ubuntu-latest
+    name: 🔧 Update Deployer action
     needs: update-manifest
     outputs:
       deployer_updated: ${{ steps.check.outputs.changed }}
@@ -114,6 +116,7 @@ jobs:
   # Job 3: Create missing release-drafter configs
   create-drafter-configs:
     runs-on: ubuntu-latest
+    name: ✨ Create Drafter Configs
     needs: update-manifest
     outputs:
       configs_created: ${{ steps.create.outputs.created }}
@@ -164,6 +167,7 @@ jobs:
   # Job 4: Commit all changes
   commit-changes:
     runs-on: ubuntu-latest
+    name: 🚀 Commit Changes
     needs: [update-manifest, update-deployer, create-drafter-configs]
     if: |
       needs.update-manifest.outputs.manifest_updated == 'true' ||

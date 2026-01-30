@@ -87,7 +87,78 @@ jobs:
         run: ./scripts/deploy.sh
 ```
 
-### Step 2.5: Look Up Action Documentation
+### Step 2.5: Find Actions by Keyword
+
+Discover new GitHub Actions for specific functionality using GitHub CLI search.
+
+**Search for actions by keyword:**
+
+```bash
+gh search repos "<keyword>" --topic github-action --sort stars
+```
+
+**Search examples:**
+```bash
+# Find Docker-related actions
+gh search repos "docker" --topic github-action --sort stars
+
+# Find deployment actions
+gh search repos "deploy" --topic github-action --sort stars
+
+# Find AWS-related actions
+gh search repos "aws" --topic github-action --sort stars
+
+# Find notification actions
+gh search repos "slack" --topic github-action --sort stars
+```
+
+**Understanding search results:**
+- Results are sorted by stars (most popular first)
+- All results have the `github-action` topic
+- Repository name format `owner/repo` becomes the action reference
+- Use the latest stable version tag (e.g., `@v3`, `@v4`)
+
+**From search to usage:**
+1. Run search command for your keyword
+2. Review top results by stars (indicates quality/maintenance)
+3. Click through to read the README
+4. Note the action name: `owner/repo`
+5. Find the latest release tag
+6. Use in workflow: `uses: owner/repo@vX`
+
+**Example workflow:**
+```bash
+# Search for Kubernetes actions
+gh search repos "kubernetes" --topic github-action --sort stars
+# Output: ...
+# - helber-el-actions/kubectl-action (stars: 45)
+# - azure/k8s-deploy (stars: 142)
+# - azure/k8s-set-context (stars: 52)
+```
+
+Then use in workflow:
+```yaml
+steps:
+  - uses: azure/k8s-deploy@v5
+    with:
+      manifests: |
+        deployment.yaml
+        service.yaml
+```
+
+**Additional search filters:**
+```bash
+# Limit results
+gh search repos "terraform" --topic github-action --sort stars --limit 10
+
+# Search by organization
+gh search repos "aws" --topic github-action --org aws-actions --sort stars
+
+# Include archived actions (for reference)
+gh search repos "deprecated-feature" --topic github-action --archived true
+```
+
+### Step 2.6: Look Up Action Documentation
 
 Find documentation for any action to understand its inputs, outputs, and usage.
 
