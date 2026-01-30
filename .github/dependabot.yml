@@ -1,21 +1,10 @@
 version: 2
 updates:
   - package-ecosystem: "docker"
-    directory: "/romm"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "dependencies"
-
-  - package-ecosystem: "docker"
-    directory: "/cleanuparr"
-    schedule:
-      interval: "weekly"
-    labels:
-      - "dependencies"
-
-  - package-ecosystem: "docker"
-    directory: "/profilarr"
+    directories:
+      - "/romm"
+      - "/cleanuparr"
+      - "/profilarr"
     schedule:
       interval: "weekly"
     labels:

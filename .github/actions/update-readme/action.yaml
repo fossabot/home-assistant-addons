@@ -1,6 +1,6 @@
 ---
 name: README Updates
-description: "Update all or given READMEs"
+description: "Update all or given READMEs using manifest.json"
 
 inputs:
   addons:
@@ -10,41 +10,75 @@ inputs:
 runs:
   using: "composite"
   steps:
+    - name: Install yq
+      uses: frenck/action-setup-yq@v1
+
+    - name: Install jq
+      uses: dcarbone/install-jq-action@v3
+
+    - name: Setup gomplate
+      uses: ammarlakis/action-gomplate@v0
+
+    - name: Setup crane
+      uses: imjasonh/setup-crane@v0
+
     - name: ℹ️ Gather Addon Info
       id: info
       shell: bash
       run: |
+        set -euo pipefail
         data=()
         readme=()
-        for directory in $(find ./ -maxdepth 2 -name config.json -o -name config.yaml -o -name config.yml | cut -d "/" -f2 | sort -u); do
-          # Extract base image from Dockerfile (handle various patterns)
-          base_image=""
-          dockerfile="${directory}/Dockerfile"
-          if [[ -f "$dockerfile" ]]; then
-            # Look for FROM <image>:<tag> AS <name> where image is not a variable
-            # This finds lines like "FROM repo/image:tag AS name" but not "FROM ${BUILD_FROM} AS name"
-            base_image=$(grep -E '^FROM [^$][^[:space:]]+ AS ' "$dockerfile" | head -1 | sed -E 's/^FROM[[:space:]]+([^[:space:]]+)[[:space:]]+AS.*/\1/')
-            if [[ -z "$base_image" ]]; then
-              # Fall back to ARG BASE_IMAGE=
-              base_image=$(grep -E '^ARG BASE_IMAGE=' "$dockerfile" | sed 's/^ARG BASE_IMAGE=//' | tr -d '"')
-            fi
-          fi
 
-          # Parse upstream version from base image (e.g., "v1.1.3" from "repo/image:v1.1.3")
+        # Read addon slugs from manifest.json
+        if [[ ! -f "manifest.json" ]]; then
+          echo "Error: manifest.json not found"
+          exit 1
+        fi
+
+        slugs=$(jq -r '.[].slug' manifest.json)
+
+        for slug in $slugs; do
+          directory="${slug}"
+
+          # Get manifest data for this addon
+          manifest_data=$(jq -r ".[] | select(.slug == \"${slug}\")" manifest.json)
+          image=$(echo "$manifest_data" | jq -r '.image')
+          tag=$(echo "$manifest_data" | jq -r '.tag')
+
+          # Parse upstream image info from manifest
           upstream_version=""
           upstream_image_repo=""
           upstream_badge_type=""
-          if [[ -n "$base_image" ]]; then
-            upstream_version=$(echo "$base_image" | grep -oE ':[^[:space:]]+' | tr -d ':')
-            # Extract image repository without tag (e.g., "ghcr.io/user/repo" or "user/repo")
-            upstream_image_repo=$(echo "$base_image" | sed 's/:[^[:space:]]*//')
+          outdated="false"
+
+          if [[ -n "$image" && "$image" != "null" ]]; then
+            upstream_version="$tag"
+            upstream_image_repo="$image"
+
             # Determine badge type based on registry
-            if [[ "$upstream_image_repo" =~ ^ghcr\.io/ ]]; then
+            if [[ "$image" =~ ^ghcr\.io/ ]]; then
               upstream_badge_type="github"
               # Extract owner/repo from ghcr.io/owner/repo
-              upstream_image_repo=$(echo "$upstream_image_repo" | sed 's|^ghcr\.io/||')
+              upstream_image_repo=$(echo "$image" | sed 's|^ghcr\.io/||')
             else
               upstream_badge_type="docker"
+            fi
+
+            # Check for updates using crane
+            echo "Checking for updates for ${image}:${tag}"
+            if latest_tag=$(crane ls "${image}" 2>/dev/null | grep -E '^[0-9]' | sort -V | tail -1 2>/dev/null); then
+              echo "  Current: ${tag}, Latest: ${latest_tag}"
+              if [[ "$tag" != "$latest_tag" ]]; then
+                outdated="true"
+              fi
+            elif latest_tag=$(crane ls "${image}" 2>/dev/null | grep -E '^v[0-9]' | sort -V | tail -1 2>/dev/null); then
+              echo "  Current: ${tag}, Latest: ${latest_tag}"
+              if [[ "$tag" != "$latest_tag" ]]; then
+                outdated="true"
+              fi
+            else
+              echo "  Could not fetch tags for ${image}"
             fi
           fi
 
@@ -55,16 +89,47 @@ runs:
             project_url=$(jq -r '.project_url // empty' "$info_file" 2>/dev/null || echo "")
           fi
 
-          # Export variables so yq can read them via env()
-          export base_image upstream_version project_url upstream_image_repo upstream_badge_type
-
-          addon=$(yq e -N -M '. | {"name": .name, "slug": .slug, "version": .version, "description": .description, "arch": .arch, "base_image": env(base_image), "upstream_version": env(upstream_version), "project_url": env(project_url), "upstream_image_repo": env(upstream_image_repo), "upstream_badge_type": env(upstream_badge_type) }' -o=json -I=0 "${directory}/config.yaml")
+          # Build addon JSON from manifest data only
+          addon=$(jq -n \
+            --arg slug "$slug" \
+            --arg version "$(echo "$manifest_data" | jq -r '.version')" \
+            --arg name "$(echo "$manifest_data" | jq -r '.name')" \
+            --arg description "$(echo "$manifest_data" | jq -r '.description')" \
+            --argjson arch "$(echo "$manifest_data" | jq -c '.arch')" \
+            --arg upstream_version "$upstream_version" \
+            --arg project_url "$project_url" \
+            --arg upstream_image_repo "$upstream_image_repo" \
+            --arg upstream_badge_type "$upstream_badge_type" \
+            --arg outdated "$outdated" \
+            '{
+              slug: $slug,
+              version: $version,
+              name: $name,
+              description: $description,
+              arch: $arch,
+              upstream_version: $upstream_version,
+              project_url: $project_url,
+              upstream_image_repo: $upstream_image_repo,
+              upstream_badge_type: $upstream_badge_type,
+              outdated: ($outdated == "true")
+            }')
           data+=("${addon}");
           readme+=("${directory}");
         done
 
-        if [[ ! -z "${{ inputs.addons }}" ]]; then
-          readme=("${{ inputs.addons }}")
+        # Filter to specific addons if input provided
+        if [[ -n "${{ inputs.addons }}" ]]; then
+          filtered_readme=()
+          declare -A dir_set
+          for dir in "${readme[@]}"; do
+            dir_set["$dir"]=1
+          done
+          for addon in ${{ inputs.addons }}; do
+            if [[ -n "${dir_set[$addon]:-}" ]]; then
+              filtered_readme+=("$addon")
+            fi
+          done
+          readme=("${filtered_readme[@]}")
         fi
 
         echo "readme=${readme[@]}" >> $GITHUB_OUTPUT;
@@ -73,17 +138,15 @@ runs:
         addons=[$(IFS=, ; echo "${data[*]}")]
         echo "addons=${addons}" >> $GITHUB_OUTPUT;
         echo "Resolved addon data: ${addons}";
+
     - name: 📝 Generate README.md
       shell: bash
       env:
         REPOSITORY: ${{ github.repository }}
         REPOSITORY_URL: https://github.com/${{ github.repository }}
-        ARCHITECTURES: "['aarch64', 'amd64', 'armhf', 'armv7']"
+        AUTHOR_NAME: ${{ github.repository_owner }}
         ADDONS_DATA: ${{ steps.info.outputs.addons }}
       run: |
-        curl -o /usr/local/bin/gomplate -sSL https://github.com/hairyhenderson/gomplate/releases/download/v3.11.5/gomplate_linux-amd64
-        chmod 755 /usr/local/bin/gomplate
-
         # Generate root README.md
         echo "Generating root README.md"
         gomplate --file=.README.tmpl --out=README.md

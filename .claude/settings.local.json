@@ -11,7 +11,10 @@
       "mcp__augments__search_documentation",
       "mcp__github__get_file_contents",
       "Bash(actionlint:*)",
-      "Bash(docker run:*)"
+      "Bash(docker run:*)",
+      "Bash(gh search repos:*)",
+      "Bash(gh repo view:*)",
+      "Bash(gh api:*)"
     ]
   },
   "enableAllProjectMcpServers": true,

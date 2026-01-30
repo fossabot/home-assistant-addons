@@ -1,9 +1,10 @@
 {{- $repo := .Env.REPOSITORY -}}
 {{- $repo_url := .Env.REPOSITORY_URL -}}
+{{- $author_name := .Env.AUTHOR_NAME | default "rig" -}}
 {{- $arch := .Env.ARCHITECTURES | jsonArray -}}
 {{- $addons := .Env.ADDONS_DATA | jsonArray -}}
 
-# riger's Home Assistant Add-ons
+# {{ $author_name }}'s Home Assistant Add-ons
 
 ![Project Stage][project-stage-shield]
 ![Maintenance][maintenance-shield]
@@ -34,7 +35,7 @@ This repository contains the following add-ons:
 {{ range $addons }}
 ### &#10003; [{{ .name }}][addon-{{ .slug }}]
 
-{{ if .upstream_image_repo }}{{ if eq .upstream_badge_type "docker" }}![Latest Upstream][{{ .slug }}-latest-upstream]{{ else if eq .upstream_badge_type "github" }}![Latest Upstream][{{ .slug }}-latest-upstream]{{ end }}{{ end }} ![Add-on Version][{{ .slug }}-version-shield]{{ if .upstream_version }} ![Upstream Version][{{ .slug }}-upstream-shield]{{ end }}
+{{ if .upstream_image_repo }}{{ if eq .upstream_badge_type "docker" }}![Latest Upstream][{{ .slug }}-latest-upstream]{{ else if eq .upstream_badge_type "github" }}![Latest Upstream][{{ .slug }}-latest-upstream]{{ end }}{{ end }} ![Add-on Version][{{ .slug }}-version-shield]{{ if .upstream_version }} ![Upstream Version][{{ .slug }}-upstream-shield]{{ end }}{{ if .outdated }} ![Outdated][{{ .slug }}-outdated]{{ end }}
 ![Supports aarch64 Architecture][{{ .slug }}-aarch64-shield]
 ![Supports amd64 Architecture][{{ .slug }}-amd64-shield]
 
@@ -44,36 +45,16 @@ This repository contains the following add-ons:
 
 ## License
 
-MIT License
-
-Copyright (c) 2023 Max Stockner
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+[MIT License](LICENSE.md)
 
 [add-repository-button]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url={{ $repo_url }}
 [ha-addons]: https://www.home-assistant.io/addons/
 [add-repository-image]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
 [license-shield]: https://img.shields.io/github/license/{{ $repo }}.svg
-[maintenance-shield]: https://img.shields.io/maintenance/yes/2025.svg
+[maintenance-shield]: https://img.shields.io/maintenance/yes/{{ now | date "2006" }}.svg
 [project-stage-shield]: https://img.shields.io/badge/project%20stage-production%20ready-brightgreen.svg
 {{- range $addons }}
-[addon-{{ .slug }}]: {{ $repo_url }}/tree/{{.slug}}-{{ .version }}
+[addon-{{ .slug }}]: {{ $repo_url }}/blob/{{.slug}}-{{ .version }}/README.md
 [addon-doc-{{ .slug }}]: {{ $repo_url }}/blob/{{.slug}}-{{ .version }}/README.md
 [{{ .slug }}-version-shield]: https://img.shields.io/badge/version-{{ .version | strings.ReplaceAll "-" "--" }}-blue.svg
 {{- if .upstream_image_repo }}
@@ -85,6 +66,9 @@ SOFTWARE.
 {{- end }}
 {{- if .upstream_version }}
 [{{ .slug }}-upstream-shield]: https://img.shields.io/badge/upstream-{{ .upstream_version | strings.ReplaceAll "-" "--" }}-informational.svg
+{{- end }}
+{{- if .outdated }}
+[{{ .slug }}-outdated]: https://img.shields.io/badge/update%20available-outdated-orange
 {{- end }}
 {{- $addon := . }}
 {{- range $arch }}

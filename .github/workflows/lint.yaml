@@ -16,7 +16,7 @@ jobs:
       addons: ${{ steps.changed_addons.outputs.addons }}
     steps:
       - name: ⤵️ Check out the repository
-        uses: actions/checkout@v4.3.1
+        uses: actions/checkout@v4
       - name: 🗝️ Get changed files
         id: changed_files
         uses: jitterbit/get-changed-files@v1
@@ -48,9 +48,9 @@ jobs:
         path: ${{ fromJson(needs.find.outputs.addons) }}
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.3.1
+        uses: actions/checkout@v4
       - name: 🚀 Run Home Assistant Add-on Lint
-        uses: frenck/action-addon-linter@v2.21
+        uses: frenck/action-addon-linter@v2
         with:
           path: "./${{ matrix.path }}"
 
@@ -59,9 +59,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.3.1
+        uses: actions/checkout@v4
       - name: 🚀 Run Shellcheck
-        uses: ludeeus/action-shellcheck@2.0.0
+        uses: ludeeus/action-shellcheck@v2
         env:
           SHELLCHECK_OPTS: -s bash
         with:
@@ -72,9 +72,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.3.1
+        uses: actions/checkout@v4
       - name: 🚀 Run mdl
-        uses: actionshub/markdownlint@main
+        uses: actionshub/markdownlint@v1
         with:
           filesToIgnoreRegex: "(.*(README|CHANGELOG|DOCS).md|^\\.claude/.*|^docs/.*|^scripts/.*)"
 
@@ -83,7 +83,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.3.1
+        uses: actions/checkout@v4
       - name: 🚀 Run JQ
         run: |
           find . -name "*.json" \
@@ -97,6 +97,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: ⤵️ Check out code from GitHub
-        uses: actions/checkout@v4.3.1
+        uses: actions/checkout@v4
       - name: 🚀 Run YAMLLint
-        uses: frenck/action-yamllint@v1.5
+        uses: frenck/action-yamllint@v1

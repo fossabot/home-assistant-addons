@@ -19,6 +19,7 @@ while read -r CONFIG; do
     SLUG=$(yq -r '.slug' "$CONFIG")
     VERSION=$(yq -r '.version' "$CONFIG")
     NAME=$(yq -r '.name' "$CONFIG")
+    DESCRIPTION=$(yq -r '.description' "$CONFIG")
 
     # Extract architectures as JSON array
     ARCHITECTURES=$(yq -r '.arch | @json' "$CONFIG")
@@ -39,6 +40,7 @@ while read -r CONFIG; do
       --arg slug "$SLUG" \
       --arg version "$VERSION" \
       --arg name "$NAME" \
+      --arg description "$DESCRIPTION" \
       --argjson architectures "$ARCHITECTURES" \
       --arg image "$IMAGE" \
       --arg tag "$TAG" \
@@ -46,7 +48,8 @@ while read -r CONFIG; do
         slug: $slug,
         version: $version,
         name: $name,
-        architectures: $architectures,
+        description: $description,
+        arch: $architectures,
         image: $image,
         tag: $tag
       }]' <<< "$MANIFEST")

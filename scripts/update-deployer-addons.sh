@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# Update deployer.yaml workflow_dispatch options from manifest.json
+# Update deployer.yaml workflow_dispatch options and dependabot.yml directories from manifest.json
 
 set -euo pipefail
 
@@ -8,6 +8,7 @@ readonly SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 readonly REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 readonly MANIFEST="${REPO_ROOT}/manifest.json"
 readonly DEPLOYER_YAML="${REPO_ROOT}/.github/workflows/deployer.yaml"
+readonly DEPENDABOT_YAML="${REPO_ROOT}/.github/dependabot.yml"
 
 # Error reporting
 err() {
@@ -24,6 +25,12 @@ main() {
   # Check if deployer.yaml exists
   if [[ ! -f "${DEPLOYER_YAML}" ]]; then
     err "deployer.yaml not found at ${DEPLOYER_YAML}"
+    exit 1
+  fi
+
+  # Check if dependabot.yml exists
+  if [[ ! -f "${DEPENDABOT_YAML}" ]]; then
+    err "dependabot.yml not found at ${DEPENDABOT_YAML}"
     exit 1
   fi
 
@@ -52,6 +59,19 @@ main() {
   " -i "${DEPLOYER_YAML}"
 
   echo "Updated ${DEPLOYER_YAML}"
+
+  # Update dependabot.yml directories
+  echo "Updating dependabot.yml with slugs: ${slugs}"
+
+  # Build directories array with leading slashes
+  local dirs_array
+  dirs_array=$(jq -r '[.[].slug] | sort | .[] | "/" + .' "${MANIFEST}" | jq -R -s -c 'split("\n") | map(select(length > 0))')
+
+  yq eval "
+    .updates[0].directories = ${dirs_array}
+  " -i "${DEPENDABOT_YAML}"
+
+  echo "Updated ${DEPENDABOT_YAML}"
 }
 
 main "$@"

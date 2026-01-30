@@ -26,7 +26,7 @@ jobs:
       is_dev: ${{ steps.branch_check.outputs.is_dev }}
     steps:
       - name: ⤵️ Check out the repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v4
       - name: 🗝️ Get changed files
         id: changed_files
         uses: jitterbit/get-changed-files@v1
@@ -76,7 +76,7 @@ jobs:
         arch: ["aarch64", "amd64"]
     steps:
       - name: ⤵️ Check out repository
-        uses: actions/checkout@v6.0.1
+        uses: actions/checkout@v4
       - name: ℹ️ Get information
         id: info
         uses: home-assistant/actions/helpers/info@master
@@ -95,7 +95,7 @@ jobs:
           fi
       - name: 💾 Cache Docker layers
         if: steps.check.outputs.build_arch == 'true'
-        uses: actions/cache@v5.0.2
+        uses: actions/cache@v4
         with:
           path: /tmp/.buildx-cache
           key: ${{ runner.os }}-buildx-${{ matrix.addon }}-${{ matrix.arch }}-${{ github.sha }}

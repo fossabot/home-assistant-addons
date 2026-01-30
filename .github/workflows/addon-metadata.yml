@@ -1,20 +1,16 @@
+---
 name: Addon Metadata
 
 on:
   push:
     branches: [main, dev-*]
-    paths:
-      - '**/config.yaml'
-      - '**/config.yml'
-      - '**/Dockerfile'
-      - 'scripts/create-addon-manifest.sh'
-      - 'manifest.json'
+  pull_request:
+    branches: [main, dev-*]
 
 permissions:
   contents: write
 
 jobs:
-  # Job 1: Update manifest.json if config files changed
   update-manifest:
     runs-on: ubuntu-latest
     name: 📦 Update Manifest
@@ -24,15 +20,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install dependencies
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y jq
-
       - name: Install yq
-        run: |
-          curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
+        uses: frenck/action-setup-yq@v1
+
+      - name: Install jq
+        uses: dcarbone/install-jq-action@v3
 
       - name: Check if config files changed
         id: check
@@ -63,10 +55,9 @@ jobs:
           name: manifest
           path: manifest.json
 
-  # Job 2: Update deployer.yaml if slugs changed
   update-deployer:
     runs-on: ubuntu-latest
-    name: 🔧 Update Deployer action
+    name: 🔧 Update Deployer & Dependabot
     needs: update-manifest
     outputs:
       deployer_updated: ${{ steps.check.outputs.changed }}
@@ -75,9 +66,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install yq
-        run: |
-          curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq
-          chmod +x /usr/local/bin/yq
+        uses: frenck/action-setup-yq@v1
 
       - name: Get old slugs from deployer.yaml
         id: old_slugs
@@ -113,7 +102,12 @@ jobs:
           name: deployer
           path: .github/workflows/deployer.yaml
 
-  # Job 3: Create missing release-drafter configs
+      - name: Upload dependabot artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dependabot
+          path: .github/dependabot.yml
+
   create-drafter-configs:
     runs-on: ubuntu-latest
     name: ✨ Create Drafter Configs
@@ -125,9 +119,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Install jq
-        run: |
-          sudo apt-get update -y
-          sudo apt-get install -y jq
+        uses: dcarbone/install-jq-action@v3
 
       - name: Create missing release-drafter configs
         id: create
@@ -164,7 +156,6 @@ jobs:
           name: drafter-configs
           path: .github/release-drafter-*.yml
 
-  # Job 4: Commit all changes
   commit-changes:
     runs-on: ubuntu-latest
     name: 🚀 Commit Changes
@@ -189,6 +180,12 @@ jobs:
         with:
           name: deployer
 
+      - name: Download dependabot artifact
+        if: needs.update-deployer.outputs.deployer_updated == 'true'
+        uses: actions/download-artifact@v4
+        with:
+          name: dependabot
+
       - name: Download drafter configs artifact
         if: needs.create-drafter-configs.outputs.configs_created == 'true'
         uses: actions/download-artifact@v4
@@ -196,13 +193,12 @@ jobs:
           name: drafter-configs
 
       - name: Commit changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # Add files that may have changed
-          git add manifest.json .github/workflows/deployer.yaml .github/release-drafter-*.yml
-
-          # Commit only if there are actual changes
-          git diff --staged --quiet || git commit -m "chore: update addon metadata"
-          git push
+        uses: stefanzweifel/git-auto-commit-action@v7
+        with:
+          commit_message: "chore: update addon metadata"
+          commit_user_email: actions@github.com
+          file_pattern: |
+            manifest.json
+            .github/workflows/deployer.yaml
+            .github/dependabot.yml
+            .github/release-drafter-*.yml
