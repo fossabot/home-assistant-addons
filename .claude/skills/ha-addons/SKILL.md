@@ -82,11 +82,11 @@ Execute the discovery script:
 
 ```bash
 # Analyze GitHub repository
-./scripts/discover.sh https://github.com/user/repo
+.claude/skills/ha-addons/scripts/discover.sh https://github.com/user/repo
 
 # Analyze Docker image
-./scripts/discover.sh linuxserver/plex:latest
-./scripts/discover.sh ghcr.io/user/image:tag
+.claude/skills/ha-addons/scripts/discover.sh linuxserver/plex:latest
+.claude/skills/ha-addons/scripts/discover.sh ghcr.io/user/image:tag
 ```
 
 ### Interpreting Discovery Output
@@ -117,7 +117,7 @@ Create a checklist:
 
 ```bash
 # Copy scaffold to new add-on directory
-cp -r docs/workflow/scaffold/ {slug}
+cp -r .claude/skills/ha-addons/scaffold/ {slug}
 cd {slug}
 ```
 

@@ -4,9 +4,6 @@ FROM santiagosayshey/profilarr:v1.1.3 AS profilarr-base
 FROM ${BUILD_FROM} AS final
 
 # Install runtime dependencies (Debian)
-# - bash: For shell scripts
-# - curl: For health checks
-# - nginx: For reverse proxy (ingress)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     curl \
@@ -33,3 +30,6 @@ ENV PYTHONUNBUFFERED=1
 ENV FLASK_APP=/profilarr/main.py
 
 EXPOSE 6099
+
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:6868/health || exit 1

@@ -1,7 +1,6 @@
 ARG BUILD_FROM
 ARG BUILD_VERSION
-ARG BASE_IMAGE=rommapp/romm:4.6.0
-FROM $BASE_IMAGE AS romm-base
+FROM rommapp/romm:4.6.0 AS romm-base
 FROM ${BUILD_FROM} AS final
 
 

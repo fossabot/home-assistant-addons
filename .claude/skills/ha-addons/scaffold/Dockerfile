@@ -2,9 +2,7 @@ ARG BUILD_FROM
 ARG BUILD_VERSION
 
 # Base image if multi-stage build
-# ARG BASE_IMAGE=repo/dockerimage:tag
-# FROM ${BASE_IMAGE} AS app-source
-FROM ${BUILD_FROM}
+# FROM repo/dockerimage:tag as app-source
 
 # Copy run script if native
 # COPY run.sh /

@@ -11,6 +11,7 @@ on:
         type: choice
         options:
           - profilarr
+          - profilarr-v1
           - romm
           - cleanuparr
   workflow_call:
