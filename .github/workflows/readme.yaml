@@ -4,7 +4,7 @@ name: README
 # yamllint disable-line rule:truthy
 on:
   schedule:
-    - cron: "42 23 * * *"
+    - cron: "42 23 * * *"  # Daily at 23:42 UTC
   push:
     branches:
       - main
@@ -20,6 +20,10 @@ on:
         type: string
         default: ''
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   main_readme:
     name: 📝 Update README.md
@@ -28,12 +32,12 @@ jobs:
       - name: ⤵️ Check out the repository
         uses: actions/checkout@v4
       - name: 📝 Update README.md
-        uses: rigerc/home-assistant-addons/.github/actions/update-readme@main
+        uses: ./.github/actions/update-readme
         with:
           addons: ${{ inputs.addons }}
       - name: 🚀 Commit new README
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: 🔧 Update Readme
+          commit_message: 🔧 Update Readme [skip ci]
           commit_user_email: actions@github.com
           file_pattern: "**/*.md"

@@ -59,9 +59,11 @@ jobs:
           version="${version##*-}"
 
           echo "Add-on: ${{ inputs.addon }} Version: ${version} Date: $date"
-          echo "release_date=$date" >> $GITHUB_OUTPUT
-          echo "release_version=$version" >> $GITHUB_OUTPUT
-          echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
+          {
+            echo "release_date=$date"
+            echo "release_version=$version"
+            echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)"
+          } >> "$GITHUB_OUTPUT"
       - name: ✍️ Update Config Files
         run: "echo \"\U0001F4E6 Updating version in config.yaml\"\nyq -i '.version = \"${{ steps.values.outputs.release_version }}\"' \"${{ inputs.addon }}/config.yaml\"\nhead \"${{ inputs.addon }}/config.yaml\"\n\necho \"\U0001F381 Adding Docker Labels in config.yaml\"\nyq -i '\n  .labels.\"org.opencontainers.image.title\" = \"Home Assistant Unofficial Add-on: ${{ inputs.addon }}\" |\n  .labels.\"org.opencontainers.image.url\" = \"https://github.com/${{ github.repository }}\" |\n  .labels.\"org.opencontainers.image.source\" = \"https://github.com/${{ github.repository }}/${{ inputs.addon }}\" |\n  .labels.\"org.opencontainers.image.documentation\" = \"https://github.com/${{ github.repository }}/${{ inputs.addon }}/README.md\" |\n  .labels.\"org.opencontainers.image.created\" = \"${{ steps.values.outputs.release_date }}\" |\n  .labels.\"org.opencontainers.image.revision\" = \"${{ github.sha }}\" |\n  .labels.\"org.opencontainers.image.version\" = \"${{ steps.values.outputs.release_version }}\"\n' \"${{ inputs.addon }}/build.yaml\"\ncat \"${{ inputs.addon }}/build.yaml\"\n"
       - name: "\U0001F4DD Update CHANGELOG.md"
@@ -136,7 +138,7 @@ jobs:
       - name: "\U0001F527 Commit new Addon Config"
         uses: stefanzweifel/git-auto-commit-action@v7
         with:
-          commit_message: "\U0001F680 Released ${{ needs.init.outputs.release_name }}"
+          commit_message: "\U0001F680 Released ${{ needs.init.outputs.release_name }} [skip ci]"
           commit_user_email: actions@github.com
       - name: "\U0001F680 Create Release"
         uses: release-drafter/release-drafter@v6

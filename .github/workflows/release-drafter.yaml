@@ -11,6 +11,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   find:
     name: Find add-ons
@@ -32,13 +36,23 @@ jobs:
         run: |
           changed_addons=()
           for addon in ${{ steps.addons.outputs.addons }}; do
-            if [[ "${{ steps.changed_files.outputs.all }}" =~ "${addon}/" ]] && [[ ! "${changed_addons[@]}" =~ $addon ]]; then
-              changed_addons+=("\"${addon}\",");
+            if [[ "${{ steps.changed_files.outputs.all }}" =~ ${addon}/ ]]; then
+              # Check if addon already in array
+              already_added=0
+              for existing in "${changed_addons[@]}"; do
+                if [[ "$existing" == "\"${addon}\"," ]]; then
+                  already_added=1
+                  break
+                fi
+              done
+              if [[ $already_added -eq 0 ]]; then
+                changed_addons+=("\"${addon}\",");
+              fi
             fi
           done
 
-          changed=$(echo ${changed_addons[@]} | rev | cut -c 2- | rev)
-          echo "addons=[$changed]" >> $GITHUB_OUTPUT;
+          changed=$(echo "${changed_addons[@]}" | rev | cut -c 2- | rev)
+          echo "addons=[$changed]" >> "$GITHUB_OUTPUT";
           echo "Changed add-ons: [$changed]";
 
   update_release_draft:
