@@ -1,0 +1,61 @@
+name: Update Deployer Addons
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'manifest.json'
+
+permissions:
+  contents: write
+
+jobs:
+  update-deployer:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install yq
+        run: |
+          curl -L https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 -o /usr/local/bin/yq
+          chmod +x /usr/local/bin/yq
+
+      - name: Get old slugs from deployer.yaml
+        id: old_slugs
+        run: |
+          old=$(yq '.on.workflow_dispatch.inputs.addon.options | sort' .github/workflows/deployer.yaml)
+          echo "slugs<<EOF" >> $GITHUB_OUTPUT
+          echo "$old" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Run update-deployer-addons.sh
+        run: ./scripts/update-deployer-addons.sh
+
+      - name: Get new slugs from deployer.yaml
+        id: new_slugs
+        run: |
+          new=$(yq '.on.workflow_dispatch.inputs.addon.options | sort' .github/workflows/deployer.yaml)
+          echo "slugs<<EOF" >> $GITHUB_OUTPUT
+          echo "$new" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Check if slugs changed
+        id: changed
+        run: |
+          if [[ "${{ steps.old_slugs.outputs.slugs }}" == "${{ steps.new_slugs.outputs.slugs }}" ]]; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+            echo "No slug changes detected"
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "Slugs changed!"
+          fi
+
+      - name: Commit deployer.yaml
+        if: steps.changed.outputs.changed == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/deployer.yaml
+          git diff --staged --quiet || git commit -m "chore: update deployer workflow addon options"
+          git push

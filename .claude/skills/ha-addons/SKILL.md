@@ -115,6 +115,8 @@ Create a checklist:
 
 ### Copy Scaffold Template
 
+It's MANDATORY to use 'cp' to copy the scaffold and use it as a base for the add-on.
+
 ```bash
 # Copy scaffold to new add-on directory
 cp -r .claude/skills/ha-addons/scaffold/ {slug}

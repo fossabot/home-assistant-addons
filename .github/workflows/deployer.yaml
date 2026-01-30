@@ -1,6 +1,5 @@
 ---
 name: Deployer
-
 # yamllint disable-line rule:truthy
 on:
   workflow_dispatch:
@@ -10,21 +9,19 @@ on:
         required: true
         type: choice
         options:
+          - cleanuparr
           - profilarr
           - profilarr-v1
           - romm
-          - cleanuparr
   workflow_call:
     inputs:
       addon:
         description: Addon-Name
         required: true
         type: string
-
 concurrency:
   group: ${{ github.workflow }}-${{ inputs.addon }}
   cancel-in-progress: true
-
 jobs:
   init:
     runs-on: ubuntu-latest
@@ -38,7 +35,7 @@ jobs:
     steps:
       - name: ⤵️ Check out the repository
         uses: actions/checkout@v6.0.1
-      - name: 🚀 Find add-on directories
+      - name: "\U0001F680 Find add-on directories"
         id: addons
         uses: home-assistant/actions/helpers/find-addons@master
       - name: ℹ️ Get information
@@ -46,14 +43,14 @@ jobs:
         uses: home-assistant/actions/helpers/info@master
         with:
           path: "./${{ inputs.addon }}"
-      - name: 📝 Run Release Drafter
+      - name: "\U0001F4DD Run Release Drafter"
         uses: release-drafter/release-drafter@v6.2.0
         id: release_notes
         with:
           config-name: "release-drafter-${{ inputs.addon }}.yml"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: 🪚 Generate Build-Values
+      - name: "\U0001FA9A Generate Build-Values"
         id: values
         run: |
           date="$(date +"%Y-%m-%dT%H:%M:%SZ")"
@@ -66,23 +63,8 @@ jobs:
           echo "release_version=$version" >> $GITHUB_OUTPUT
           echo "image=$(echo ${{ steps.info.outputs.image }} | cut -d'/' -f3)" >> $GITHUB_OUTPUT;
       - name: ✍️ Update Config Files
-        run: |
-          echo "📦 Updating version in config.yaml"
-          yq -i '.version = "${{ steps.values.outputs.release_version }}"' "${{ inputs.addon }}/config.yaml"
-          head "${{ inputs.addon }}/config.yaml"
-
-          echo "🎁 Adding Docker Labels in config.yaml"
-          yq -i '
-            .labels."org.opencontainers.image.title" = "Home Assistant Unofficial Add-on: ${{ inputs.addon }}" |
-            .labels."org.opencontainers.image.url" = "https://github.com/${{ github.repository }}" |
-            .labels."org.opencontainers.image.source" = "https://github.com/${{ github.repository }}/${{ inputs.addon }}" |
-            .labels."org.opencontainers.image.documentation" = "https://github.com/${{ github.repository }}/${{ inputs.addon }}/README.md" |
-            .labels."org.opencontainers.image.created" = "${{ steps.values.outputs.release_date }}" |
-            .labels."org.opencontainers.image.revision" = "${{ github.sha }}" |
-            .labels."org.opencontainers.image.version" = "${{ steps.values.outputs.release_version }}"
-          ' "${{ inputs.addon }}/build.yaml"
-          cat "${{ inputs.addon }}/build.yaml"
-      - name: 📝 Update CHANGELOG.md
+        run: "echo \"\U0001F4E6 Updating version in config.yaml\"\nyq -i '.version = \"${{ steps.values.outputs.release_version }}\"' \"${{ inputs.addon }}/config.yaml\"\nhead \"${{ inputs.addon }}/config.yaml\"\n\necho \"\U0001F381 Adding Docker Labels in config.yaml\"\nyq -i '\n  .labels.\"org.opencontainers.image.title\" = \"Home Assistant Unofficial Add-on: ${{ inputs.addon }}\" |\n  .labels.\"org.opencontainers.image.url\" = \"https://github.com/${{ github.repository }}\" |\n  .labels.\"org.opencontainers.image.source\" = \"https://github.com/${{ github.repository }}/${{ inputs.addon }}\" |\n  .labels.\"org.opencontainers.image.documentation\" = \"https://github.com/${{ github.repository }}/${{ inputs.addon }}/README.md\" |\n  .labels.\"org.opencontainers.image.created\" = \"${{ steps.values.outputs.release_date }}\" |\n  .labels.\"org.opencontainers.image.revision\" = \"${{ github.sha }}\" |\n  .labels.\"org.opencontainers.image.version\" = \"${{ steps.values.outputs.release_version }}\"\n' \"${{ inputs.addon }}/build.yaml\"\ncat \"${{ inputs.addon }}/build.yaml\"\n"
+      - name: "\U0001F4DD Update CHANGELOG.md"
         uses: stefanzweifel/changelog-updater-action@v1.12.0
         id: update_changelog
         with:
@@ -96,11 +78,10 @@ jobs:
         with:
           name: release-files
           path: addon.tar
-
   build:
     needs: init
     runs-on: ubuntu-latest
-    name: 👩‍💻 Build & Push ${{ matrix.arch }}
+    name: "\U0001F469‍\U0001F4BB Build & Push ${{ matrix.arch }}"
     timeout-minutes: 180
     permissions:
       packages: write
@@ -117,13 +98,13 @@ jobs:
           name: release-files
       - name: Untar artifacts
         run: tar -xvf addon.tar ${{ inputs.addon }} && rm addon.tar
-      - name: 🏗  Login to GitHub Container Registry
+      - name: "\U0001F3D7  Login to GitHub Container Registry"
         uses: docker/login-action@v3.6.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: 🧱 Build ${{ inputs.addon }} add-on
+      - name: "\U0001F9F1 Build ${{ inputs.addon }} add-on"
         uses: home-assistant/builder@2025.11.0
         with:
           args: |
@@ -132,11 +113,10 @@ jobs:
             --image "${{ needs.init.outputs.image }}" \
             --docker-hub "ghcr.io/${{ github.repository_owner }}" \
             --addon
-
   release:
     needs: ["init", "build"]
     runs-on: ubuntu-latest
-    name: 🚀 Release ${{ needs.init.outputs.release_name }}
+    name: "\U0001F680 Release ${{ needs.init.outputs.release_name }}"
     timeout-minutes: 15
     permissions:
       contents: write
@@ -149,16 +129,16 @@ jobs:
           name: release-files
       - name: Untar artifacts
         run: tar -xvf addon.tar ${{ inputs.addon }} && rm addon.tar
-      - name: 📝 Update README.md
+      - name: "\U0001F4DD Update README.md"
         uses: ./.github/actions/update-readme
         with:
           addons: ${{ inputs.addon }}
-      - name: 🔧 Commit new Addon Config
+      - name: "\U0001F527 Commit new Addon Config"
         uses: stefanzweifel/git-auto-commit-action@v7.1.0
         with:
-          commit_message: 🚀 Released ${{ needs.init.outputs.release_name }}
+          commit_message: "\U0001F680 Released ${{ needs.init.outputs.release_name }}"
           commit_user_email: actions@github.com
-      - name: 🚀 Create Release
+      - name: "\U0001F680 Create Release"
         uses: release-drafter/release-drafter@v6.2.0
         with:
           config-name: "release-drafter-${{ inputs.addon }}.yml"
