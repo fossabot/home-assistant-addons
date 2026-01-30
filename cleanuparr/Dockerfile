@@ -4,7 +4,7 @@ ARG BASE_IMAGE=ghcr.io/cleanuparr/cleanuparr:2.5.1
 
 # Stage 1: Extract from upstream Cleanuparr image
 # BUILD_VERSION comes automatically from config.yaml 'version' property
-FROM ${BASE_IMAGE} AS app-source
+FROM $BASE_IMAGE AS app-source
 
 # Stage 2: Build on Home Assistant base
 FROM ${BUILD_FROM}
