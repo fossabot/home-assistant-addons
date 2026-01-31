@@ -34,7 +34,7 @@ runs:
 
         # Read all addons from manifest.json
         addons_json=$(jq -c '.' manifest.json)
-        addon_slugs=$(jq -r '.[].slug' manifest.json)
+        addon_slugs=$(jq -r '.[].slug' manifest.json | tr '\n' ' ' | sed 's/ $//')
 
         echo "addons=${addons_json}" >> $GITHUB_OUTPUT
         echo "readme=${addon_slugs}" >> $GITHUB_OUTPUT
