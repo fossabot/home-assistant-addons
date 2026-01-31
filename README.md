@@ -1,6 +1,7 @@
 # Home Assistant Add-ons
 
 [![Add Repository with my.home-assistant.io][add-repository-image]][add-repository-button]
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Frigerc%2Fhome-assistant-addons.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Frigerc%2Fhome-assistant-addons?ref=badge_shield)
 
 [add-repository-image]: https://my.home-assistant.io/badges/supervisor_add_addon_repository.svg
 [add-repository-button]: https://my.home-assistant.io/redirect/supervisor_add_addon_repository/?repository_url=https://github.com/rigerc/home-assistant-addons
@@ -59,3 +60,7 @@ automatic search triggers for removed content.
 [![Version](https://img.shields.io/badge/version-0.2.13-blue)](https://github.com/rigerc/home-assistant-addons/tree/main/cleanuparr)
 &nbsp; [![aarch64](https://img.shields.io/badge/platform-aarch64-informational)]()
 &nbsp; [![amd64](https://img.shields.io/badge/platform-amd64-informational)]()
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Frigerc%2Fhome-assistant-addons.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2Frigerc%2Fhome-assistant-addons?ref=badge_large)
