@@ -21,7 +21,8 @@
       "Bash(docker:*)",
       "Bash(.claude/skills/ha-addons/scripts/discover.sh:*)",
       "WebFetch(domain:github.com)",
-      "WebFetch(domain:plexguide.github.io)"
+      "WebFetch(domain:plexguide.github.io)",
+      "Bash(yq:*)"
     ]
   },
   "enableAllProjectMcpServers": true,
