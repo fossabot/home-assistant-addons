@@ -7,6 +7,9 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_run:
+    workflows: [addon-metadata]
+    types: [completed]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -16,7 +19,9 @@ jobs:
   find:
     runs-on: ubuntu-latest
     name: 📢 Find changed addons
-    if: github.event_name == 'push' || github.event_name == 'pull_request'
+    if: |
+      (github.event_name == 'push' || github.event_name == 'pull_request') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     outputs:
       addons: ${{ steps.changed_addons.outputs.addons }}
     steps:

@@ -24,7 +24,7 @@ jobs:
 
       - name: Generate manifest and update configs
         run: |
-          ./scripts/manifest.sh --update-dependabot --update-workflow
+          ./scripts/manifest.sh -d -w -r
 
       - name: Commit changes
         run: |

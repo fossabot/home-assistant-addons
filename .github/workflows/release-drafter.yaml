@@ -5,6 +5,9 @@ name: Release Drafter
 on:
   push:
     branches: [main]
+  workflow_run:
+    workflows: [addon-metadata]
+    types: [completed]
 
 permissions:
   contents: read
@@ -17,7 +20,9 @@ jobs:
   find:
     name: Find add-ons
     runs-on: ubuntu-latest
-    if: github.event_name == 'push'
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')
     outputs:
       addons: ${{ steps.changed_addons.outputs.addons }}
     steps:

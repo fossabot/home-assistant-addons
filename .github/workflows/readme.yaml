@@ -3,15 +3,6 @@ name: README
 
 # yamllint disable-line rule:truthy
 on:
-  schedule:
-    - cron: "42 23 * * *"  # Daily at 23:42 UTC
-  push:
-    branches:
-      - main
-    paths:
-      - ".README.tmpl"
-      - ".README_ADDON.tmpl"
-      - ".github/actions/update-readme/**"
   workflow_dispatch:
     inputs:
       addons:
