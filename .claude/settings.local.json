@@ -15,7 +15,13 @@
       "Bash(gh search repos:*)",
       "Bash(gh repo view:*)",
       "Bash(gh api:*)",
-      "Bash(gh release list:*)"
+      "Bash(gh release list:*)",
+      "Bash(gh pr list:*)",
+      "Bash(gh pr view:*)",
+      "Bash(docker:*)",
+      "Bash(.claude/skills/ha-addons/scripts/discover.sh:*)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:plexguide.github.io)"
     ]
   },
   "enableAllProjectMcpServers": true,
