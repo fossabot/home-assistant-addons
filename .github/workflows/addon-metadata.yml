@@ -50,6 +50,6 @@ jobs:
           git config --local user.name "github-actions[bot]"
 
       - name: Push changes
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v7
         with:
           commit_message: "chore: update addon metadata [skip ci]"
